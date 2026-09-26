@@ -14,6 +14,7 @@ import { Route as AparenciaRouteImport } from './routes/aparencia'
 import { Route as BibliotecaRouteImport } from './routes/biblioteca'
 import { Route as DefinicoesRouteImport } from './routes/definicoes'
 import { Route as EcrasRouteImport } from './routes/ecras'
+import { Route as FontesRouteImport } from './routes/fontes'
 import { Route as LayoutsRouteImport } from './routes/layouts'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as RegistoRouteImport } from './routes/registo'
@@ -43,6 +44,11 @@ const EcrasRoute = EcrasRouteImport.update({
   path: '/ecras',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FontesRoute = FontesRouteImport.update({
+  id: '/fontes',
+  path: '/fontes',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LayoutsRoute = LayoutsRouteImport.update({
   id: '/layouts',
   path: '/layouts',
@@ -65,6 +71,7 @@ export interface FileRoutesByFullPath {
   '/biblioteca': typeof BibliotecaRoute
   '/definicoes': typeof DefinicoesRoute
   '/ecras': typeof EcrasRoute
+  '/fontes': typeof FontesRoute
   '/layouts': typeof LayoutsRoute
   '/login': typeof LoginRoute
   '/registo': typeof RegistoRoute
@@ -75,6 +82,7 @@ export interface FileRoutesByTo {
   '/biblioteca': typeof BibliotecaRoute
   '/definicoes': typeof DefinicoesRoute
   '/ecras': typeof EcrasRoute
+  '/fontes': typeof FontesRoute
   '/layouts': typeof LayoutsRoute
   '/login': typeof LoginRoute
   '/registo': typeof RegistoRoute
@@ -86,6 +94,7 @@ export interface FileRoutesById {
   '/biblioteca': typeof BibliotecaRoute
   '/definicoes': typeof DefinicoesRoute
   '/ecras': typeof EcrasRoute
+  '/fontes': typeof FontesRoute
   '/layouts': typeof LayoutsRoute
   '/login': typeof LoginRoute
   '/registo': typeof RegistoRoute
@@ -98,6 +107,7 @@ export interface FileRouteTypes {
     | '/biblioteca'
     | '/definicoes'
     | '/ecras'
+    | '/fontes'
     | '/layouts'
     | '/login'
     | '/registo'
@@ -108,6 +118,7 @@ export interface FileRouteTypes {
     | '/biblioteca'
     | '/definicoes'
     | '/ecras'
+    | '/fontes'
     | '/layouts'
     | '/login'
     | '/registo'
@@ -118,6 +129,7 @@ export interface FileRouteTypes {
     | '/biblioteca'
     | '/definicoes'
     | '/ecras'
+    | '/fontes'
     | '/layouts'
     | '/login'
     | '/registo'
@@ -129,6 +141,7 @@ export interface RootRouteChildren {
   BibliotecaRoute: typeof BibliotecaRoute
   DefinicoesRoute: typeof DefinicoesRoute
   EcrasRoute: typeof EcrasRoute
+  FontesRoute: typeof FontesRoute
   LayoutsRoute: typeof LayoutsRoute
   LoginRoute: typeof LoginRoute
   RegistoRoute: typeof RegistoRoute
@@ -171,6 +184,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EcrasRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/fontes': {
+      id: '/fontes'
+      path: '/fontes'
+      fullPath: '/fontes'
+      preLoaderRoute: typeof FontesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/layouts': {
       id: '/layouts'
       path: '/layouts'
@@ -201,6 +221,7 @@ const rootRouteChildren: RootRouteChildren = {
   BibliotecaRoute: BibliotecaRoute,
   DefinicoesRoute: DefinicoesRoute,
   EcrasRoute: EcrasRoute,
+  FontesRoute: FontesRoute,
   LayoutsRoute: LayoutsRoute,
   LoginRoute: LoginRoute,
   RegistoRoute: RegistoRoute,
