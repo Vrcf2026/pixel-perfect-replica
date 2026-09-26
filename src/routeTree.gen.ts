@@ -10,7 +10,11 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AparenciaRouteImport } from './routes/aparencia'
 import { Route as BibliotecaRouteImport } from './routes/biblioteca'
+import { Route as DefinicoesRouteImport } from './routes/definicoes'
+import { Route as EcrasRouteImport } from './routes/ecras'
+import { Route as LayoutsRouteImport } from './routes/layouts'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as RegistoRouteImport } from './routes/registo'
 
@@ -19,9 +23,29 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AparenciaRoute = AparenciaRouteImport.update({
+  id: '/aparencia',
+  path: '/aparencia',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BibliotecaRoute = BibliotecaRouteImport.update({
   id: '/biblioteca',
   path: '/biblioteca',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DefinicoesRoute = DefinicoesRouteImport.update({
+  id: '/definicoes',
+  path: '/definicoes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EcrasRoute = EcrasRouteImport.update({
+  id: '/ecras',
+  path: '/ecras',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LayoutsRoute = LayoutsRouteImport.update({
+  id: '/layouts',
+  path: '/layouts',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -37,34 +61,75 @@ const RegistoRoute = RegistoRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/aparencia': typeof AparenciaRoute
   '/biblioteca': typeof BibliotecaRoute
+  '/definicoes': typeof DefinicoesRoute
+  '/ecras': typeof EcrasRoute
+  '/layouts': typeof LayoutsRoute
   '/login': typeof LoginRoute
   '/registo': typeof RegistoRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/aparencia': typeof AparenciaRoute
   '/biblioteca': typeof BibliotecaRoute
+  '/definicoes': typeof DefinicoesRoute
+  '/ecras': typeof EcrasRoute
+  '/layouts': typeof LayoutsRoute
   '/login': typeof LoginRoute
   '/registo': typeof RegistoRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/aparencia': typeof AparenciaRoute
   '/biblioteca': typeof BibliotecaRoute
+  '/definicoes': typeof DefinicoesRoute
+  '/ecras': typeof EcrasRoute
+  '/layouts': typeof LayoutsRoute
   '/login': typeof LoginRoute
   '/registo': typeof RegistoRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/biblioteca' | '/login' | '/registo'
+  fullPaths:
+    | '/'
+    | '/aparencia'
+    | '/biblioteca'
+    | '/definicoes'
+    | '/ecras'
+    | '/layouts'
+    | '/login'
+    | '/registo'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/biblioteca' | '/login' | '/registo'
-  id: '__root__' | '/' | '/biblioteca' | '/login' | '/registo'
+  to:
+    | '/'
+    | '/aparencia'
+    | '/biblioteca'
+    | '/definicoes'
+    | '/ecras'
+    | '/layouts'
+    | '/login'
+    | '/registo'
+  id:
+    | '__root__'
+    | '/'
+    | '/aparencia'
+    | '/biblioteca'
+    | '/definicoes'
+    | '/ecras'
+    | '/layouts'
+    | '/login'
+    | '/registo'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AparenciaRoute: typeof AparenciaRoute
   BibliotecaRoute: typeof BibliotecaRoute
+  DefinicoesRoute: typeof DefinicoesRoute
+  EcrasRoute: typeof EcrasRoute
+  LayoutsRoute: typeof LayoutsRoute
   LoginRoute: typeof LoginRoute
   RegistoRoute: typeof RegistoRoute
 }
@@ -78,11 +143,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/aparencia': {
+      id: '/aparencia'
+      path: '/aparencia'
+      fullPath: '/aparencia'
+      preLoaderRoute: typeof AparenciaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/biblioteca': {
       id: '/biblioteca'
       path: '/biblioteca'
       fullPath: '/biblioteca'
       preLoaderRoute: typeof BibliotecaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/definicoes': {
+      id: '/definicoes'
+      path: '/definicoes'
+      fullPath: '/definicoes'
+      preLoaderRoute: typeof DefinicoesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ecras': {
+      id: '/ecras'
+      path: '/ecras'
+      fullPath: '/ecras'
+      preLoaderRoute: typeof EcrasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/layouts': {
+      id: '/layouts'
+      path: '/layouts'
+      fullPath: '/layouts'
+      preLoaderRoute: typeof LayoutsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -104,7 +197,11 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AparenciaRoute: AparenciaRoute,
   BibliotecaRoute: BibliotecaRoute,
+  DefinicoesRoute: DefinicoesRoute,
+  EcrasRoute: EcrasRoute,
+  LayoutsRoute: LayoutsRoute,
   LoginRoute: LoginRoute,
   RegistoRoute: RegistoRoute,
 }
