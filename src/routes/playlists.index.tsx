@@ -63,14 +63,14 @@ function PlaylistsPage() {
       .insert({ org_id: org.org_id, name: "Nova playlist" })
       .select("id")
       .single();
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     void navigate({ to: "/playlists/$id", params: { id: data.id as string } });
   };
 
   const remove = async (row: Row) => {
     if (!confirm(`Apagar a playlist "${row.name}"?`)) return;
     const { error } = await supabase.from("playlists").delete().eq("id", row.id);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success("Playlist apagada.");
     void load();
   };

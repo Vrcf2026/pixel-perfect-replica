@@ -7,7 +7,7 @@ export function TextSlide({ data }: SlideProps) {
   const text = (data.text_color as string) || "#FFFFFF";
   const accent = (data.accent as string) || "#F28C28";
   const align = (data.align as string) === "left" ? "left" : "center";
-  const size = SIZES[(data.size as string) || "l"] ?? SIZES.l;
+  const size = SIZES[(data.size as string) || "l"] ?? SIZES['l'];
 
   return (
     <div

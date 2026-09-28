@@ -103,7 +103,7 @@ function FontesPage() {
   const remove = async (row: SourceRow) => {
     if (!confirm(`Apagar a fonte "${row.name}"?`)) return;
     const { error } = await supabase.from("sources").delete().eq("id", row.id);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success("Fonte apagada.");
     void load();
   };
@@ -197,7 +197,7 @@ function SourceDialog({
 
   const save = async () => {
     if (!org) return;
-    if (!form.name?.trim()) return toast.error("Dê um nome à fonte.");
+    if (!form.name?.trim()) { toast.error("Dê um nome à fonte."); return; }
     setBusy(true);
     const payload = {
       org_id: org.org_id,
@@ -216,7 +216,7 @@ function SourceDialog({
       ? await supabase.from("sources").update(payload).eq("id", form.id)
       : await supabase.from("sources").insert(payload);
     setBusy(false);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success("Fonte guardada.");
     onClose();
     onSaved();
@@ -312,7 +312,7 @@ function SourceDialog({
               value={[form.volume ?? 100]}
               max={100}
               step={5}
-              onValueChange={([v]) => set({ volume: v })}
+              onValueChange={([v]) => set({ volume: v ?? 100 })}
             />
           </div>
           <div className="space-y-2">
@@ -394,7 +394,7 @@ function ImportDialog({
   const importSelected = async () => {
     if (!org) return;
     const chosen = channels.filter((c) => selected.has(c.url));
-    if (chosen.length === 0) return toast.error("Escolha pelo menos um canal.");
+    if (chosen.length === 0) { toast.error("Escolha pelo menos um canal."); return; }
     setBusy(true);
     const { error } = await supabase.from("sources").insert(
       chosen.map((c) => ({
@@ -405,7 +405,7 @@ function ImportDialog({
       })),
     );
     setBusy(false);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success(`${chosen.length} canal(is) importado(s).`);
     onClose();
     onSaved();

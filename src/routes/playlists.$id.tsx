@@ -108,7 +108,7 @@ function PlaylistEditor() {
     setPlaylist(p.data as Playlist | null);
     setItems(((it.data ?? []) as unknown as Item[]) ?? []);
     setSources((src.data ?? []) as typeof sources);
-    setSelectedId((prev) => prev ?? ((it.data?.[0]?.id as string) ?? null));
+    setSelectedId((prev) => prev ?? ((it.data?.[0]?.id as string | undefined) ?? null));
     setLoading(false);
   }, [id, org]);
 
@@ -145,7 +145,7 @@ function PlaylistEditor() {
       })
       .select()
       .single();
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     setAdding(false);
     setItems((l) => [...l, data as unknown as Item]);
     setSelectedId(data.id as string);
@@ -170,7 +170,7 @@ function PlaylistEditor() {
       })
       .select()
       .single();
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     setItems((l) => [...l, data as unknown as Item]);
     toast.success("Item duplicado.");
   };
@@ -178,7 +178,7 @@ function PlaylistEditor() {
   const removeItem = async (item: Item) => {
     if (!confirm("Apagar este item?")) return;
     const { error } = await supabase.from("playlist_items").delete().eq("id", item.id);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     setItems((l) => l.filter((i) => i.id !== item.id));
     if (selectedId === item.id) setSelectedId(null);
   };
@@ -361,7 +361,7 @@ function PlaylistEditor() {
                     <Button
                       onClick={async () => {
                         const err = validateData(selected.kind, selected.data);
-                        if (err) return toast.error(err);
+                        if (err) { toast.error(err); return; }
                         await saveItem(selected.id, { data: selected.data });
                         toast.success("Item guardado.");
                       }}
