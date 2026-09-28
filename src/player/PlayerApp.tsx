@@ -9,7 +9,7 @@ const REFRESH_MS = 5 * 60_000;
 const PREVIEW_POLL_MS = 30_000;
 const cacheKey = (token: string) => `montra:${token}`;
 
-type Status = "loading" | "ok" | "offline" | "notfound";
+type Status = "loading" | "ok" | "offline" | "notfound" | "suspended";
 
 function readCache(token: string): PlayerConfig | null {
   try {
@@ -46,6 +46,8 @@ export function PlayerApp({ token, preview }: { token: string; preview: boolean 
   const [config, setConfig] = useState<PlayerConfig | null>(null);
   const [status, setStatus] = useState<Status>("loading");
   const versionRef = useRef<string | null>(null);
+  const configRef = useRef<PlayerConfig | null>(null);
+  configRef.current = config;
   const startedAt = useRef(Date.now());
 
   const apply = useCallback(
@@ -72,7 +74,18 @@ export function PlayerApp({ token, preview }: { token: string; preview: boolean 
         setConfig(null);
         return;
       }
-      if (cfg.version !== versionRef.current) apply(cfg);
+      if (cfg?.error === "org_suspended") {
+        versionRef.current = cfg.version ?? "suspended";
+        setStatus("suspended");
+        setConfig(null);
+        try {
+          localStorage.removeItem(cacheKey(token));
+        } catch {
+          /* ignore */
+        }
+        return;
+      }
+      if (cfg.version !== versionRef.current || !configRef.current) apply(cfg);
     } catch (e) {
       reportPlayerError(`Config: ${e instanceof Error ? e.message : String(e)}`);
       setStatus((s) => (s === "ok" ? s : "offline"));
@@ -162,6 +175,9 @@ export function PlayerApp({ token, preview }: { token: string; preview: boolean 
     };
   }, [preview]);
 
+  if (status === "suspended") {
+    return <div className="fixed inset-0 bg-black" />;
+  }
   if (status === "notfound") {
     return (
       <Message title="Ecrã não encontrado" text="Este link não existe ou o ecrã está desativado." />

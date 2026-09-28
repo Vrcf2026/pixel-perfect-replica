@@ -14,6 +14,8 @@ import {
   Building2,
   Loader2,
   Users,
+  Crown,
+  PauseCircle,
 } from "lucide-react";
 import { useAuth } from "@/features/auth/AuthContext";
 import { useOrg } from "@/features/org/OrgContext";
@@ -48,7 +50,10 @@ const ROLE_LABEL: Record<string, string> = {
 
 function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const { memberships, org, setOrg, role } = useOrg();
+  const { memberships, org, setOrg, role, isSuper } = useOrg();
+  const nav = isSuper
+    ? [{ to: "/clientes", label: "Clientes", icon: Crown } as const, ...NAV]
+    : NAV;
   const { signOut } = useAuth();
   const navigate = useNavigate();
 
@@ -65,18 +70,21 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
               {memberships.map((m) => (
                 <SelectItem key={m.org_id} value={m.org_id}>
                   {m.name}
+                  {m.suspended ? " (suspenso)" : ""}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
           {role ? (
-            <div className="mt-1 text-xs text-sidebar-foreground/60">{ROLE_LABEL[role]}</div>
+            <div className="mt-1 text-xs text-sidebar-foreground/60">
+              {org?.viaSuper ? "Acesso de administrador" : ROLE_LABEL[role]}
+            </div>
           ) : null}
         </div>
       </div>
 
       <nav className="flex-1 space-y-1 px-2">
-        {NAV.map((item) => {
+        {nav.map((item) => {
           const active = item.to === "/" ? pathname === "/" : pathname.startsWith(item.to);
           return (
             <Link
@@ -122,7 +130,7 @@ export function AppShell({
   children: ReactNode;
 }) {
   const { session, loading: authLoading } = useAuth();
-  const { loading: orgLoading, memberships } = useOrg();
+  const { loading: orgLoading, memberships, org } = useOrg();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
 
@@ -166,13 +174,24 @@ export function AppShell({
           <h1 className="font-display flex-1 truncate text-xl font-semibold">{title}</h1>
           <div className="flex items-center gap-2">{actions}</div>
         </header>
+        {org?.suspended ? (
+          <div className="flex items-center gap-2 border-b border-amber-300 bg-amber-50 px-4 py-2 text-sm text-amber-900 md:px-6">
+            <PauseCircle className="h-4 w-4 shrink-0" />
+            Esta organização está suspensa: os ecrãs não mostram conteúdo até ser reativada.
+          </div>
+        ) : null}
         <main className="flex-1 p-4 md:p-6">{children}</main>
       </div>
     </div>
   );
 }
 
-export function EmptyState({ icon: Icon = Building2, title, description, action }: {
+export function EmptyState({
+  icon: Icon = Building2,
+  title,
+  description,
+  action,
+}: {
   icon?: typeof Building2;
   title: string;
   description?: string;

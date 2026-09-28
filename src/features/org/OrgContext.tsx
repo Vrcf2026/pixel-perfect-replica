@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { db } from "@/lib/untypedDb";
 import { useAuth } from "@/features/auth/AuthContext";
 
 export type Role = "owner" | "editor" | "viewer";
@@ -8,6 +9,9 @@ export type Membership = {
   org_id: string;
   role: Role;
   name: string;
+  suspended?: boolean;
+  /** true quando o acesso vem de ser superadmin e não de ser membro */
+  viaSuper?: boolean;
 };
 
 type OrgValue = {
@@ -16,6 +20,7 @@ type OrgValue = {
   org: Membership | null;
   role: Role | null;
   canEdit: boolean;
+  isSuper: boolean;
   setOrg: (orgId: string) => void;
   refresh: () => Promise<void>;
 };
@@ -28,6 +33,7 @@ const OrgCtx = createContext<OrgValue>({
   org: null,
   role: null,
   canEdit: false,
+  isSuper: false,
   setOrg: () => {},
   refresh: async () => {},
 });
@@ -37,9 +43,11 @@ export function OrgProvider({ children }: { children: ReactNode }) {
   const [memberships, setMemberships] = useState<Membership[]>([]);
   const [orgId, setOrgId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isSuper, setIsSuper] = useState(false);
 
   const load = useCallback(async () => {
     if (!user) {
+      setIsSuper(false);
       setMemberships([]);
       setOrgId(null);
       setLoading(false);
@@ -66,6 +74,31 @@ export function OrgProvider({ children }: { children: ReactNode }) {
         name: orgRow?.name ?? "Organização",
       };
     });
+    // Superadmin: acede a todas as organizações.
+    const { data: sup } = await db.rpc("is_superadmin");
+    const superadmin = sup === true;
+    setIsSuper(superadmin);
+    const { data: orgRows } = await db.from("organizations").select("id, name, suspended");
+    const orgInfo = new Map(
+      ((orgRows ?? []) as Array<{ id: string; name: string; suspended?: boolean }>).map((o) => [
+        o.id,
+        o,
+      ]),
+    );
+    for (const m of list) m.suspended = orgInfo.get(m.org_id)?.suspended ?? false;
+    if (superadmin) {
+      for (const o of orgInfo.values()) {
+        if (!list.some((m) => m.org_id === o.id)) {
+          list.push({
+            org_id: o.id,
+            role: "owner",
+            name: o.name,
+            suspended: o.suspended ?? false,
+            viaSuper: true,
+          });
+        }
+      }
+    }
     list.sort((a, b) => a.name.localeCompare(b.name, "pt"));
     setMemberships(list);
 
@@ -95,6 +128,7 @@ export function OrgProvider({ children }: { children: ReactNode }) {
         org,
         role: org?.role ?? null,
         canEdit: org?.role === "owner" || org?.role === "editor",
+        isSuper,
         setOrg,
         refresh: load,
       }}

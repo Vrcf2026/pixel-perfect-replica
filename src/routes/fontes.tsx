@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Radio, Plus, Pencil, Trash2, Play, ListPlus, Loader2 } from "lucide-react";
+import { Radio, Plus, Pencil, Trash2, Play, ListPlus, Loader2, CopyX } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useOrg } from "@/features/org/OrgContext";
@@ -23,7 +23,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export const Route = createFileRoute("/fontes")({
   head: () => ({
@@ -31,7 +37,10 @@ export const Route = createFileRoute("/fontes")({
       { title: "Fontes de vídeo — VRCF Montra" },
       { name: "description", content: "Canais em direto, vídeos e páginas para os seus ecrãs." },
       { property: "og:title", content: "Fontes de vídeo — VRCF Montra" },
-      { property: "og:description", content: "Canais em direto, vídeos e páginas para os seus ecrãs." },
+      {
+        property: "og:description",
+        content: "Canais em direto, vídeos e páginas para os seus ecrãs.",
+      },
     ],
   }),
   component: FontesPage,
@@ -100,13 +109,63 @@ function FontesPage() {
     void load();
   }, [load]);
 
-  const remove = async (row: SourceRow) => {
-    if (!confirm(`Apagar a fonte "${row.name}"?`)) return;
-    const { error } = await supabase.from("sources").delete().eq("id", row.id);
-    if (error) { toast.error(error.message); return; }
-    toast.success("Fonte apagada.");
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+
+  /** Apaga fontes, avisando se estão a ser usadas em layouts ou playlists. */
+  const removeMany = async (list: SourceRow[], ask = true) => {
+    if (!list.length) return;
+    const ids = list.map((r) => r.id);
+    const [zones, items] = await Promise.all([
+      supabase
+        .from("layout_zones")
+        .select("id", { count: "exact", head: true })
+        .in("source_id", ids),
+      supabase
+        .from("playlist_items")
+        .select("id, data")
+        .eq("kind", "stream")
+        .eq("org_id", org?.org_id ?? ""),
+    ]);
+    const usedInItems = (items.data ?? []).filter((i) =>
+      ids.includes(String((i.data as Record<string, unknown> | null)?.["source_id"] ?? "")),
+    ).length;
+    const used = (zones.count ?? 0) + usedInItems;
+    const what = list.length === 1 ? `a fonte "${list[0]?.name}"` : `${list.length} fontes`;
+    const warn = used
+      ? `\n\nAtenção: está(ão) a ser usada(s) em ${zones.count ?? 0} zona(s) de layout e ${usedInItems} item(ns) de playlist. Essas zonas ficam sem vídeo.`
+      : "";
+    if (ask && !confirm(`Remover ${what}?${warn}`)) return;
+    const { error } = await supabase.from("sources").delete().in("id", ids);
+    if (error) {
+      toast.error(`Não foi possível remover: ${error.message}`);
+      return;
+    }
+    toast.success(list.length === 1 ? "Fonte removida." : `${list.length} fontes removidas.`);
+    setSelected(new Set());
     void load();
   };
+
+  const remove = (row: SourceRow) => removeMany([row]);
+
+  /** Mantém a primeira de cada grupo com o mesmo endereço (ou nome, se não tiver endereço). */
+  const duplicates = (() => {
+    const seen = new Set<string>();
+    const dup: SourceRow[] = [];
+    for (const r of rows) {
+      const key = `${r.kind}|${(r.url || "").trim().toLowerCase() || `nome:${r.name.trim().toLowerCase()}`}|${r.media_id ?? ""}`;
+      if (seen.has(key)) dup.push(r);
+      else seen.add(key);
+    }
+    return dup;
+  })();
+
+  const toggleSel = (id: string) =>
+    setSelected((cur) => {
+      const next = new Set(cur);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
 
   return (
     <AppShell
@@ -136,23 +195,75 @@ function FontesPage() {
         />
       ) : (
         <div className="grid gap-3">
+          {canEdit ? (
+            <div className="flex flex-wrap items-center gap-2 rounded-lg border bg-muted/40 px-3 py-2 text-sm">
+              <Checkbox
+                checked={selected.size > 0 && selected.size === rows.length}
+                onCheckedChange={(on) =>
+                  setSelected(on ? new Set(rows.map((r) => r.id)) : new Set())
+                }
+                aria-label="Selecionar todas"
+              />
+              <span className="text-muted-foreground">
+                {selected.size ? `${selected.size} selecionada(s)` : `${rows.length} fonte(s)`}
+              </span>
+              <div className="ml-auto flex flex-wrap gap-2">
+                {duplicates.length ? (
+                  <Button size="sm" variant="outline" onClick={() => void removeMany(duplicates)}>
+                    <CopyX className="mr-1.5 h-3.5 w-3.5" />
+                    Remover {duplicates.length} duplicada(s)
+                  </Button>
+                ) : null}
+                {selected.size ? (
+                  <Button
+                    size="sm"
+                    variant="destructive"
+                    onClick={() => void removeMany(rows.filter((r) => selected.has(r.id)))}
+                  >
+                    <Trash2 className="mr-1.5 h-3.5 w-3.5" />
+                    Remover selecionadas
+                  </Button>
+                ) : null}
+              </div>
+            </div>
+          ) : null}
           {rows.map((s) => (
-            <div key={s.id} className="flex flex-wrap items-center gap-3 rounded-lg border bg-card p-4">
+            <div
+              key={s.id}
+              className={`flex flex-wrap items-center gap-3 rounded-lg border bg-card p-4 ${selected.has(s.id) ? "border-[#F28C28]" : ""}`}
+            >
+              {canEdit ? (
+                <Checkbox
+                  checked={selected.has(s.id)}
+                  onCheckedChange={() => toggleSel(s.id)}
+                  aria-label={`Selecionar ${s.name}`}
+                />
+              ) : null}
               <div className="min-w-0 flex-1">
                 <div className="truncate font-medium">{s.name}</div>
                 <div className="truncate text-xs text-muted-foreground">{s.url || "—"}</div>
               </div>
-              <Badge variant="secondary">{KINDS.find((k) => k.value === s.kind)?.label ?? s.kind}</Badge>
+              <Badge variant="secondary">
+                {KINDS.find((k) => k.value === s.kind)?.label ?? s.kind}
+              </Badge>
               <Button size="sm" variant="outline" onClick={() => setPreview(s)}>
-                <Play className="h-3.5 w-3.5" />
+                <Play className="mr-1.5 h-3.5 w-3.5" />
+                Ver
               </Button>
               {canEdit ? (
                 <>
                   <Button size="sm" variant="outline" onClick={() => setEditing(s)}>
-                    <Pencil className="h-3.5 w-3.5" />
+                    <Pencil className="mr-1.5 h-3.5 w-3.5" />
+                    Editar
                   </Button>
-                  <Button size="sm" variant="outline" onClick={() => remove(s)}>
-                    <Trash2 className="h-3.5 w-3.5" />
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="text-destructive hover:text-destructive"
+                    onClick={() => void remove(s)}
+                  >
+                    <Trash2 className="mr-1.5 h-3.5 w-3.5" />
+                    Remover
                   </Button>
                 </>
               ) : null}
@@ -197,7 +308,10 @@ function SourceDialog({
 
   const save = async () => {
     if (!org) return;
-    if (!form.name?.trim()) { toast.error("Dê um nome à fonte."); return; }
+    if (!form.name?.trim()) {
+      toast.error("Dê um nome à fonte.");
+      return;
+    }
     setBusy(true);
     const payload = {
       org_id: org.org_id,
@@ -216,7 +330,10 @@ function SourceDialog({
       ? await supabase.from("sources").update(payload).eq("id", form.id)
       : await supabase.from("sources").insert(payload);
     setBusy(false);
-    if (error) { toast.error(error.message); return; }
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     toast.success("Fonte guardada.");
     onClose();
     onSaved();
@@ -394,7 +511,10 @@ function ImportDialog({
   const importSelected = async () => {
     if (!org) return;
     const chosen = channels.filter((c) => selected.has(c.url));
-    if (chosen.length === 0) { toast.error("Escolha pelo menos um canal."); return; }
+    if (chosen.length === 0) {
+      toast.error("Escolha pelo menos um canal.");
+      return;
+    }
     setBusy(true);
     const { error } = await supabase.from("sources").insert(
       chosen.map((c) => ({
@@ -405,7 +525,10 @@ function ImportDialog({
       })),
     );
     setBusy(false);
-    if (error) { toast.error(error.message); return; }
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     toast.success(`${chosen.length} canal(is) importado(s).`);
     onClose();
     onSaved();
@@ -441,7 +564,11 @@ function ImportDialog({
             Escolher ficheiro
           </Button>
           {channels.length > 0 ? (
-            <Input placeholder="Pesquisar canal ou grupo" value={q} onChange={(e) => setQ(e.target.value)} />
+            <Input
+              placeholder="Pesquisar canal ou grupo"
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+            />
           ) : null}
         </div>
 
@@ -450,10 +577,15 @@ function ImportDialog({
             <div className="max-h-[50vh] space-y-4 overflow-y-auto">
               {groups.map(([group, list]) => (
                 <div key={group}>
-                  <div className="mb-1 text-xs font-semibold uppercase text-muted-foreground">{group}</div>
+                  <div className="mb-1 text-xs font-semibold uppercase text-muted-foreground">
+                    {group}
+                  </div>
                   <div className="space-y-1">
                     {list.map((c) => (
-                      <label key={c.url} className="flex items-center gap-2 rounded px-2 py-1 hover:bg-muted">
+                      <label
+                        key={c.url}
+                        className="flex items-center gap-2 rounded px-2 py-1 hover:bg-muted"
+                      >
                         <Checkbox
                           checked={selected.has(c.url)}
                           onCheckedChange={(v) =>
@@ -465,7 +597,9 @@ function ImportDialog({
                             })
                           }
                         />
-                        {c.logo ? <img src={c.logo} alt="" className="h-5 w-5 object-contain" /> : null}
+                        {c.logo ? (
+                          <img src={c.logo} alt="" className="h-5 w-5 object-contain" />
+                        ) : null}
                         <span className="flex-1 truncate text-sm">{c.name}</span>
                         <Badge variant="secondary" className="text-[10px] uppercase">
                           {c.kind}

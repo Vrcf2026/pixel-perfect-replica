@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AparenciaRouteImport } from './routes/aparencia'
 import { Route as BibliotecaRouteImport } from './routes/biblioteca'
+import { Route as ClientesRouteImport } from './routes/clientes'
 import { Route as DefinicoesRouteImport } from './routes/definicoes'
 import { Route as FontesRouteImport } from './routes/fontes'
 import { Route as LoginRouteImport } from './routes/login'
@@ -38,6 +39,11 @@ const AparenciaRoute = AparenciaRouteImport.update({
 const BibliotecaRoute = BibliotecaRouteImport.update({
   id: '/biblioteca',
   path: '/biblioteca',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ClientesRoute = ClientesRouteImport.update({
+  id: '/clientes',
+  path: '/clientes',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DefinicoesRoute = DefinicoesRouteImport.update({
@@ -105,6 +111,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/aparencia': typeof AparenciaRoute
   '/biblioteca': typeof BibliotecaRoute
+  '/clientes': typeof ClientesRoute
   '/definicoes': typeof DefinicoesRoute
   '/fontes': typeof FontesRoute
   '/login': typeof LoginRoute
@@ -122,6 +129,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/aparencia': typeof AparenciaRoute
   '/biblioteca': typeof BibliotecaRoute
+  '/clientes': typeof ClientesRoute
   '/definicoes': typeof DefinicoesRoute
   '/fontes': typeof FontesRoute
   '/login': typeof LoginRoute
@@ -140,6 +148,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/aparencia': typeof AparenciaRoute
   '/biblioteca': typeof BibliotecaRoute
+  '/clientes': typeof ClientesRoute
   '/definicoes': typeof DefinicoesRoute
   '/fontes': typeof FontesRoute
   '/login': typeof LoginRoute
@@ -159,6 +168,7 @@ export interface FileRouteTypes {
     | '/'
     | '/aparencia'
     | '/biblioteca'
+    | '/clientes'
     | '/definicoes'
     | '/fontes'
     | '/login'
@@ -176,6 +186,7 @@ export interface FileRouteTypes {
     | '/'
     | '/aparencia'
     | '/biblioteca'
+    | '/clientes'
     | '/definicoes'
     | '/fontes'
     | '/login'
@@ -193,6 +204,7 @@ export interface FileRouteTypes {
     | '/'
     | '/aparencia'
     | '/biblioteca'
+    | '/clientes'
     | '/definicoes'
     | '/fontes'
     | '/login'
@@ -211,6 +223,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AparenciaRoute: typeof AparenciaRoute
   BibliotecaRoute: typeof BibliotecaRoute
+  ClientesRoute: typeof ClientesRoute
   DefinicoesRoute: typeof DefinicoesRoute
   FontesRoute: typeof FontesRoute
   LoginRoute: typeof LoginRoute
@@ -246,6 +259,13 @@ declare module '@tanstack/react-router' {
       path: '/biblioteca'
       fullPath: '/biblioteca'
       preLoaderRoute: typeof BibliotecaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/clientes': {
+      id: '/clientes'
+      path: '/clientes'
+      fullPath: '/clientes'
+      preLoaderRoute: typeof ClientesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/definicoes': {
@@ -339,6 +359,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AparenciaRoute: AparenciaRoute,
   BibliotecaRoute: BibliotecaRoute,
+  ClientesRoute: ClientesRoute,
   DefinicoesRoute: DefinicoesRoute,
   FontesRoute: FontesRoute,
   LoginRoute: LoginRoute,

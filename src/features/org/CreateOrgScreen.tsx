@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export function CreateOrgScreen() {
-  const { refresh } = useOrg();
+  const { refresh, isSuper } = useOrg();
   const { signOut } = useAuth();
   const [name, setName] = useState("");
   const [busy, setBusy] = useState(false);
@@ -26,6 +26,27 @@ export function CreateOrgScreen() {
     toast.success("Organização criada.");
     await refresh();
   };
+
+  if (!isSuper) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-muted/40 p-4">
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <CardTitle className="font-display text-2xl">Sem organização</CardTitle>
+            <CardDescription>
+              A sua conta ainda não está associada a nenhuma organização. Contacte a VRCF para lhe
+              darem acesso.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button variant="outline" className="w-full" onClick={() => signOut()}>
+              Terminar sessão
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-muted/40 p-4">

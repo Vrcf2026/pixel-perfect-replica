@@ -3,6 +3,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Loader2, MonitorPlay, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { db } from "@/lib/untypedDb";
 import { useOrg } from "@/features/org/OrgContext";
 import { AppShell, EmptyState } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
@@ -55,13 +56,18 @@ function ScreensPage() {
   const [form, setForm] = useState<ScreenFormValue>(EMPTY);
   const [busy, setBusy] = useState(false);
   const [, setNow] = useState(0);
+  const [maxScreens, setMaxScreens] = useState<number | null>(null);
 
   const load = useCallback(async () => {
     if (!org) return;
-    const [s, l] = await Promise.all([
+    const [s, l, o] = await Promise.all([
       supabase.from("screens").select("*").eq("org_id", org.org_id).order("name"),
       supabase.from("layouts").select("id,name,orientation").eq("org_id", org.org_id).order("name"),
+      db.from("organizations").select("max_screens").eq("id", org.org_id).maybeSingle(),
     ]);
+    setMaxScreens(
+      ((o.data as { max_screens?: number | null } | null)?.max_screens ?? null) as number | null,
+    );
     if (s.error) toast.error(s.error.message);
     setRows((s.data ?? []) as unknown as ScreenRow[]);
     setLayouts((l.data ?? []) as LayoutLite[]);
@@ -107,18 +113,30 @@ function ScreensPage() {
     void navigate({ to: "/ecras/$id", params: { id: data.id as string } });
   };
 
+  const atLimit = maxScreens !== null && rows.length >= maxScreens;
   const layoutName = (id: string | null) => layouts.find((l) => l.id === id)?.name ?? "—";
 
   return (
     <AppShell
       title="Ecrãs"
       actions={
-        canEdit ? (
-          <Button onClick={() => setOpen(true)}>
-            <Plus className="mr-2 h-4 w-4" />
-            Novo ecrã
-          </Button>
-        ) : null
+        <>
+          {maxScreens !== null ? (
+            <span className={`text-xs ${atLimit ? "text-amber-700" : "text-muted-foreground"}`}>
+              {rows.length} de {maxScreens} ecrãs
+            </span>
+          ) : null}
+          {canEdit ? (
+            <Button
+              onClick={() => setOpen(true)}
+              disabled={atLimit}
+              title={atLimit ? "Limite de ecrãs atingido. Contacte o administrador." : undefined}
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Novo ecrã
+            </Button>
+          ) : null}
+        </>
       }
     >
       {loading ? (
