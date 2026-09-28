@@ -13,6 +13,7 @@ import {
   LogOut,
   Building2,
   Loader2,
+  Users,
 } from "lucide-react";
 import { useAuth } from "@/features/auth/AuthContext";
 import { useOrg } from "@/features/org/OrgContext";
@@ -35,6 +36,7 @@ const NAV = [
   { to: "/fontes", label: "Fontes de vídeo", icon: Radio },
   { to: "/biblioteca", label: "Biblioteca", icon: Images },
   { to: "/aparencia", label: "Aparência", icon: Palette },
+  { to: "/utilizadores", label: "Utilizadores", icon: Users },
   { to: "/definicoes", label: "Definições", icon: Settings },
 ] as const;
 
