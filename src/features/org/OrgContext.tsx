@@ -8,7 +8,6 @@ export type Membership = {
   org_id: string;
   role: Role;
   name: string;
-  slug: string;
 };
 
 type OrgValue = {
@@ -49,7 +48,7 @@ export function OrgProvider({ children }: { children: ReactNode }) {
     setLoading(true);
     const { data, error } = await supabase
       .from("org_members")
-      .select("org_id, role, organizations(name, slug)")
+      .select("org_id, role, organizations(name)")
       .eq("user_id", user.id);
 
     if (error) {
@@ -60,12 +59,11 @@ export function OrgProvider({ children }: { children: ReactNode }) {
     }
 
     const list: Membership[] = (data ?? []).map((row) => {
-      const orgRow = row.organizations as unknown as { name: string; slug: string } | null;
+      const orgRow = row.organizations as unknown as { name: string } | null;
       return {
         org_id: row.org_id as string,
         role: row.role as Role,
         name: orgRow?.name ?? "Organização",
-        slug: orgRow?.slug ?? "",
       };
     });
     list.sort((a, b) => a.name.localeCompare(b.name, "pt"));

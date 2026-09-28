@@ -5,7 +5,13 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 type Props = {
   kind: ItemKind;
@@ -37,7 +43,15 @@ function Text({
   );
 }
 
-function Colour({ label, value, onChange }: { label: string; value: unknown; onChange: (v: string) => void }) {
+function Colour({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: unknown;
+  onChange: (v: string) => void;
+}) {
   return (
     <div className="space-y-1.5">
       <Label>{label}</Label>
@@ -48,7 +62,11 @@ function Colour({ label, value, onChange }: { label: string; value: unknown; onC
           onChange={(e) => onChange(e.target.value)}
           className="h-9 w-12 rounded border"
         />
-        <Input value={String(value ?? "")} onChange={(e) => onChange(e.target.value)} placeholder="#0F1E36" />
+        <Input
+          value={String(value ?? "")}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder="#0F1E36"
+        />
       </div>
     </div>
   );
@@ -99,32 +117,78 @@ export function ItemForm({ kind, data, onChange, sources }: Props) {
         <div className="space-y-4">
           <div className="grid gap-4 sm:grid-cols-2">
             <Text label="Nome *" value={data.name} onChange={(v) => set({ name: v })} />
-            <Text label="Preço *" value={data.price} onChange={(v) => set({ price: v })} placeholder="9,99 €" />
-            <Text label="Preço anterior" value={data.old_price} onChange={(v) => set({ old_price: v })} />
-            <Text label="Sufixo do preço" value={data.price_suffix} onChange={(v) => set({ price_suffix: v })} placeholder="/kg" />
+            <Text
+              label="Preço *"
+              value={data.price}
+              onChange={(v) => set({ price: v })}
+              placeholder="9,99 ou texto livre"
+            />
+            <Text
+              label="Preço anterior"
+              value={data.old_price}
+              onChange={(v) => set({ old_price: v })}
+            />
+            <Text
+              label="Sufixo do preço"
+              value={data.price_suffix}
+              onChange={(v) => set({ price_suffix: v })}
+              placeholder="/kg"
+            />
             <Text label="Categoria" value={data.category} onChange={(v) => set({ category: v })} />
-            <Text label="Selo" value={data.badge} onChange={(v) => set({ badge: v })} placeholder="Promoção" />
+            <Text
+              label="Selo"
+              value={data.badge}
+              onChange={(v) => set({ badge: v })}
+              placeholder="Promoção"
+            />
           </div>
-          <Colour label="Cor do selo" value={data.badge_color} onChange={(v) => set({ badge_color: v })} />
+          <Colour
+            label="Cor do selo"
+            value={data.badge_color}
+            onChange={(v) => set({ badge_color: v })}
+          />
           <div className="space-y-1.5">
             <Label>Descrição</Label>
-            <Textarea value={String(data.description ?? "")} onChange={(e) => set({ description: e.target.value })} />
+            <Textarea
+              value={String(data.description ?? "")}
+              onChange={(e) => set({ description: e.target.value })}
+            />
           </div>
-          <Picker label="Imagem" kind="image" value={data.image_url} onChange={(v) => set({ image_url: v })} />
+          <Picker
+            label="Imagem"
+            kind="image"
+            value={data.image_url}
+            onChange={(v) => set({ image_url: v })}
+          />
           <div className="space-y-1.5">
             <Label>Modelo</Label>
-            <Select value={String(data.template ?? "photo_left")} onValueChange={(v) => set({ template: v })}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+            <Select
+              value={String(data.template ?? "photo_left")}
+              onValueChange={(v) => set({ template: v })}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
                 {PRODUCT_TEMPLATES.map((t) => (
-                  <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
+                  <SelectItem key={t.value} value={t.value}>
+                    {t.label}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
-            <Text label="Ligação do código QR" value={data.qr_url} onChange={(v) => set({ qr_url: v })} />
-            <Text label="Legenda do QR" value={data.qr_caption} onChange={(v) => set({ qr_caption: v })} />
+            <Text
+              label="Ligação do código QR"
+              value={data.qr_url}
+              onChange={(v) => set({ qr_url: v })}
+            />
+            <Text
+              label="Legenda do QR"
+              value={data.qr_caption}
+              onChange={(v) => set({ qr_caption: v })}
+            />
           </div>
           <Style data={data} set={set} />
         </div>
@@ -142,22 +206,47 @@ export function ItemForm({ kind, data, onChange, sources }: Props) {
               onChange={(e) => set({ bullets: e.target.value.split("\n").filter(Boolean) })}
             />
           </div>
-          <Text label="Ícone" value={data.icon} onChange={(v) => set({ icon: v })} placeholder="scissors, car, coffee…" />
-          <Picker label="Imagem" kind="image" value={data.image_url} onChange={(v) => set({ image_url: v })} />
+          <Text
+            label="Ícone"
+            value={data.icon}
+            onChange={(v) => set({ icon: v })}
+            placeholder="scissors, car, coffee…"
+          />
+          <Picker
+            label="Imagem"
+            kind="image"
+            value={data.image_url}
+            onChange={(v) => set({ image_url: v })}
+          />
           <div className="space-y-1.5">
             <Label>Modelo</Label>
-            <Select value={String(data.template ?? "big_title")} onValueChange={(v) => set({ template: v })}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+            <Select
+              value={String(data.template ?? "big_title")}
+              onValueChange={(v) => set({ template: v })}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
                 {SERVICE_TEMPLATES.map((t) => (
-                  <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
+                  <SelectItem key={t.value} value={t.value}>
+                    {t.label}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
-            <Text label="Ligação do código QR" value={data.qr_url} onChange={(v) => set({ qr_url: v })} />
-            <Text label="Legenda do QR" value={data.qr_caption} onChange={(v) => set({ qr_caption: v })} />
+            <Text
+              label="Ligação do código QR"
+              value={data.qr_url}
+              onChange={(v) => set({ qr_url: v })}
+            />
+            <Text
+              label="Legenda do QR"
+              value={data.qr_caption}
+              onChange={(v) => set({ qr_caption: v })}
+            />
           </div>
           <Style data={data} set={set} />
         </div>
@@ -166,12 +255,19 @@ export function ItemForm({ kind, data, onChange, sources }: Props) {
     case "image":
       return (
         <div className="space-y-4">
-          <Picker label="Imagem *" kind="image" value={data.image_url} onChange={(v) => set({ image_url: v })} />
+          <Picker
+            label="Imagem *"
+            kind="image"
+            value={data.image_url}
+            onChange={(v) => set({ image_url: v })}
+          />
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-1.5">
               <Label>Ajuste</Label>
               <Select value={String(data.fit ?? "cover")} onValueChange={(v) => set({ fit: v })}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="cover">Preencher</SelectItem>
                   <SelectItem value="contain">Caber toda</SelectItem>
@@ -183,7 +279,10 @@ export function ItemForm({ kind, data, onChange, sources }: Props) {
           <Text label="Legenda" value={data.caption} onChange={(v) => set({ caption: v })} />
           <div className="flex items-center justify-between">
             <Label>Movimento lento (Ken Burns)</Label>
-            <Switch checked={Boolean(data.ken_burns)} onCheckedChange={(v) => set({ ken_burns: v })} />
+            <Switch
+              checked={Boolean(data.ken_burns)}
+              onCheckedChange={(v) => set({ ken_burns: v })}
+            />
           </div>
         </div>
       );
@@ -191,12 +290,19 @@ export function ItemForm({ kind, data, onChange, sources }: Props) {
     case "video":
       return (
         <div className="space-y-4">
-          <Picker label="Vídeo *" kind="video" value={data.video_url} onChange={(v) => set({ video_url: v })} />
+          <Picker
+            label="Vídeo *"
+            kind="video"
+            value={data.video_url}
+            onChange={(v) => set({ video_url: v })}
+          />
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-1.5">
               <Label>Ajuste</Label>
               <Select value={String(data.fit ?? "cover")} onValueChange={(v) => set({ fit: v })}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="cover">Preencher</SelectItem>
                   <SelectItem value="contain">Caber todo</SelectItem>
@@ -217,10 +323,14 @@ export function ItemForm({ kind, data, onChange, sources }: Props) {
         <div className="space-y-1.5">
           <Label>Fonte de vídeo *</Label>
           <Select value={String(data.source_id ?? "")} onValueChange={(v) => set({ source_id: v })}>
-            <SelectTrigger><SelectValue placeholder="Escolher fonte" /></SelectTrigger>
+            <SelectTrigger>
+              <SelectValue placeholder="Escolher fonte" />
+            </SelectTrigger>
             <SelectContent>
               {sources.map((s) => (
-                <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
+                <SelectItem key={s.id} value={s.id}>
+                  {s.name}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -233,13 +343,21 @@ export function ItemForm({ kind, data, onChange, sources }: Props) {
           <Text label="Título" value={data.title} onChange={(v) => set({ title: v })} />
           <div className="space-y-1.5">
             <Label>Texto</Label>
-            <Textarea value={String(data.body ?? "")} onChange={(e) => set({ body: e.target.value })} />
+            <Textarea
+              value={String(data.body ?? "")}
+              onChange={(e) => set({ body: e.target.value })}
+            />
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-1.5">
               <Label>Alinhamento</Label>
-              <Select value={String(data.align ?? "center")} onValueChange={(v) => set({ align: v })}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+              <Select
+                value={String(data.align ?? "center")}
+                onValueChange={(v) => set({ align: v })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="left">À esquerda</SelectItem>
                   <SelectItem value="center">Ao centro</SelectItem>
@@ -249,7 +367,9 @@ export function ItemForm({ kind, data, onChange, sources }: Props) {
             <div className="space-y-1.5">
               <Label>Tamanho</Label>
               <Select value={String(data.size ?? "l")} onValueChange={(v) => set({ size: v })}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="m">Médio</SelectItem>
                   <SelectItem value="l">Grande</SelectItem>
@@ -258,7 +378,12 @@ export function ItemForm({ kind, data, onChange, sources }: Props) {
               </Select>
             </div>
           </div>
-          <Picker label="Imagem de fundo" kind="image" value={data.bg_image_url} onChange={(v) => set({ bg_image_url: v })} />
+          <Picker
+            label="Imagem de fundo"
+            kind="image"
+            value={data.bg_image_url}
+            onChange={(v) => set({ bg_image_url: v })}
+          />
           <Style data={data} set={set} />
         </div>
       );
@@ -271,7 +396,11 @@ export function ItemForm({ kind, data, onChange, sources }: Props) {
           <Text label="Legenda" value={data.caption} onChange={(v) => set({ caption: v })} />
           <div className="grid gap-4 sm:grid-cols-2">
             <Colour label="Fundo" value={data.bg} onChange={(v) => set({ bg: v })} />
-            <Colour label="Texto" value={data.text_color} onChange={(v) => set({ text_color: v })} />
+            <Colour
+              label="Texto"
+              value={data.text_color}
+              onChange={(v) => set({ text_color: v })}
+            />
           </div>
         </div>
       );
@@ -307,19 +436,36 @@ export function ItemForm({ kind, data, onChange, sources }: Props) {
     case "catalog_feed":
       return (
         <div className="space-y-4">
-          <Text label="Link do catálogo (JSON) *" value={data.url} onChange={(v) => set({ url: v })} />
+          <Text
+            label="Link do catálogo (JSON) *"
+            value={data.url}
+            onChange={(v) => set({ url: v })}
+          />
           <div className="grid gap-4 sm:grid-cols-3">
             <div className="space-y-1.5">
               <Label>Máximo de produtos</Label>
-              <Input type="number" value={Number(data.limit ?? 20)} onChange={(e) => set({ limit: Number(e.target.value) })} />
+              <Input
+                type="number"
+                value={Number(data.limit ?? 20)}
+                onChange={(e) => set({ limit: Number(e.target.value) })}
+              />
             </div>
             <div className="space-y-1.5">
               <Label>Segundos por produto</Label>
-              <Input type="number" value={Number(data.per_item_s ?? 8)} onChange={(e) => set({ per_item_s: Number(e.target.value) })} />
+              <Input
+                type="number"
+                value={Number(data.per_item_s ?? 8)}
+                onChange={(e) => set({ per_item_s: Number(e.target.value) })}
+              />
             </div>
             <div className="space-y-1.5">
               <Label>Multiplicador de preço</Label>
-              <Input type="number" step="0.01" value={Number(data.price_multiplier ?? 1)} onChange={(e) => set({ price_multiplier: Number(e.target.value) })} />
+              <Input
+                type="number"
+                step="0.01"
+                value={Number(data.price_multiplier ?? 1)}
+                onChange={(e) => set({ price_multiplier: Number(e.target.value) })}
+              />
             </div>
           </div>
           <div className="flex items-center justify-between">
@@ -357,11 +503,18 @@ export function ItemForm({ kind, data, onChange, sources }: Props) {
           </div>
           <div className="space-y-1.5">
             <Label>Modelo</Label>
-            <Select value={String(data.template ?? "photo_left")} onValueChange={(v) => set({ template: v })}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+            <Select
+              value={String(data.template ?? "photo_left")}
+              onValueChange={(v) => set({ template: v })}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
                 {PRODUCT_TEMPLATES.map((t) => (
-                  <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
+                  <SelectItem key={t.value} value={t.value}>
+                    {t.label}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>

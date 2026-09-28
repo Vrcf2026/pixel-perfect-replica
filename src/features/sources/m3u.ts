@@ -27,8 +27,13 @@ export function parseM3U(text: string): M3UChannel[] {
     }
     if (line.startsWith("#")) continue;
     const url = line;
-    const lower = url.toLowerCase();
-    const kind: "hls" | "ts" = lower.includes(".ts") && !lower.includes(".m3u8") ? "ts" : "hls";
+    let path = url.toLowerCase();
+    try {
+      path = new URL(url).pathname.toLowerCase();
+    } catch {
+      /* URL relativo ou inválido: usa o texto todo */
+    }
+    const kind: "hls" | "ts" = path.endsWith(".ts") ? "ts" : "hls";
     out.push({ name: pending?.name ?? url, url, logo: pending?.logo, group: pending?.group, kind });
     pending = null;
   }

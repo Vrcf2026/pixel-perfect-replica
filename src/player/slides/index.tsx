@@ -33,11 +33,17 @@ export function Slide({ kind, data, sources }: { kind: string } & SlideProps) {
       </div>
     );
   }
-  return <>{Cmp({ data, sources })}</>;
+  return <Cmp data={data} sources={sources} />;
 }
 
 /** Caixa 16:9 com container-queries para as medidas em cqw/cqh. */
-export function SlideFrame({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+export function SlideFrame({
+  children,
+  className = "",
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
   return (
     <div
       className={`relative aspect-video w-full overflow-hidden rounded-lg bg-black ${className}`}

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { ProductSlide } from "./ProductSlide";
+import { formatPrice } from "@/player/lib/format";
 import type { SlideProps } from "./types";
 
 type Row = Record<string, unknown>;
@@ -28,21 +29,28 @@ export function CatalogFeedSlide({ data }: SlideProps) {
     if (!url) return;
     let cancelled = false;
     fetch(url, { headers })
-      .then((r) => r.json())
+      .then((r) => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json();
+      })
       .then((json) => {
         if (cancelled) return;
         let list: Row[] = Array.isArray(json)
           ? json
-          : Array.isArray((json as Row)['items'])
-            ? ((json as Row)['items'] as Row[])
-            : Array.isArray((json as Row)['data'])
-              ? ((json as Row)['data'] as Row[])
+          : Array.isArray((json as Row)["items"])
+            ? ((json as Row)["items"] as Row[])
+            : Array.isArray((json as Row)["data"])
+              ? ((json as Row)["data"] as Row[])
               : [];
         if (data.shuffle) list = [...list].sort(() => Math.random() - 0.5);
         setRows(list.slice(0, limit));
         setError(null);
       })
-      .catch(() => !cancelled && setError("Não foi possível ler o catálogo."));
+      .catch(
+        (e: unknown) =>
+          !cancelled &&
+          setError(`Não foi possível ler o catálogo (${e instanceof Error ? e.message : "erro"}).`),
+      );
     return () => {
       cancelled = true;
     };
@@ -72,21 +80,18 @@ export function CatalogFeedSlide({ data }: SlideProps) {
     );
   }
 
-  const rawPrice = pick(row, map['price'] ?? "price");
-  const priceNum = Number(String(rawPrice ?? "").replace(",", "."));
-  const price = Number.isFinite(priceNum)
-    ? `${(priceNum * multiplier).toFixed(2).replace(".", ",")} €`
-    : String(rawPrice ?? "");
+  const rawPrice = pick(row, map["price"] ?? "price");
+  const price = formatPrice(rawPrice, { multiplier });
 
   return (
     <ProductSlide
       data={{
-        name: String(pick(row, map['name'] ?? "name") ?? ""),
+        name: String(pick(row, map["name"] ?? "name") ?? ""),
         price,
-        image_url: pick(row, map['image_url'] ?? "image") ?? undefined,
-        category: pick(row, map['category'] ?? "category") ?? undefined,
-        description: pick(row, map['description'] ?? "description") ?? undefined,
-        badge: pick(row, map['badge'] ?? "badge") ?? undefined,
+        image_url: pick(row, map["image_url"] ?? "image_url") ?? undefined,
+        category: pick(row, map["category"] ?? "category") ?? undefined,
+        description: pick(row, map["description"] ?? "description") ?? undefined,
+        badge: pick(row, map["badge"] ?? "badge") ?? undefined,
         template: data.template ?? "photo_left",
         bg: data.bg,
         text_color: data.text_color,

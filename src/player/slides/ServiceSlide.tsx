@@ -1,3 +1,4 @@
+import { QrImage } from "@/player/components/QrImage";
 import * as Icons from "lucide-react";
 import type { SlideProps } from "./types";
 
@@ -23,7 +24,9 @@ export function ServiceSlide({ data }: SlideProps) {
   const body = (
     <div className="flex flex-1 flex-col justify-center gap-[2%] p-[5%]">
       <Icon name={data.icon as string} color={accent} />
-      <div className="font-display text-[6.5cqw] leading-[1.05] font-bold">{String(data.title ?? "")}</div>
+      <div className="font-display text-[6.5cqw] leading-[1.05] font-bold">
+        {String(data.title ?? "")}
+      </div>
       {data.subtitle ? <div className="text-[3cqw] opacity-80">{String(data.subtitle)}</div> : null}
       {bullets.length > 0 ? (
         <ul className="mt-[1%] space-y-[1%] text-[2.6cqw]">
@@ -37,12 +40,13 @@ export function ServiceSlide({ data }: SlideProps) {
       ) : null}
       {data.qr_url ? (
         <div className="mt-[2%] flex items-center gap-[2%]">
-          <img
-            src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(String(data.qr_url))}`}
-            alt=""
+          <QrImage
+            value={String(data.qr_url)}
             className="h-[12cqh] w-[12cqh] rounded bg-white p-[0.5%]"
           />
-          {data.qr_caption ? <span className="text-[2cqw] opacity-80">{String(data.qr_caption)}</span> : null}
+          {data.qr_caption ? (
+            <span className="text-[2cqw] opacity-80">{String(data.qr_caption)}</span>
+          ) : null}
         </div>
       ) : null}
     </div>
@@ -50,8 +54,13 @@ export function ServiceSlide({ data }: SlideProps) {
 
   if (template === "image_background") {
     return (
-      <div className="relative h-full w-full overflow-hidden" style={{ background: bg, color: text }}>
-        {image ? <img src={image} alt="" className="absolute inset-0 h-full w-full object-cover" /> : null}
+      <div
+        className="relative h-full w-full overflow-hidden"
+        style={{ background: bg, color: text }}
+      >
+        {image ? (
+          <img src={image} alt="" className="absolute inset-0 h-full w-full object-cover" />
+        ) : null}
         <div className="absolute inset-0 bg-black/55" />
         <div className="relative flex h-full">{body}</div>
       </div>

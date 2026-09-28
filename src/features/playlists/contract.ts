@@ -97,7 +97,7 @@ export type ItemData = {
 export function defaultData(kind: ItemKind): ItemData {
   switch (kind) {
     case "product":
-      return { name: "Novo produto", price: "9,99 €", template: "photo_left" };
+      return { name: "Novo produto", price: "9,99", template: "photo_left" };
     case "service":
       return { title: "Novo serviço", template: "big_title", bullets: [] };
     case "image":

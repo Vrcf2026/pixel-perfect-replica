@@ -37,7 +37,13 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export const Route = createFileRoute("/playlists/$id")({
   head: () => ({
@@ -90,7 +96,16 @@ function PlaylistEditor() {
   const { org, canEdit } = useOrg();
   const [playlist, setPlaylist] = useState<Playlist | null>(null);
   const [items, setItems] = useState<Item[]>([]);
-  const [sources, setSources] = useState<Array<{ id: string; name: string; kind: string; url: string | null; muted: boolean; fit: string }>>([]);
+  const [sources, setSources] = useState<
+    Array<{
+      id: string;
+      name: string;
+      kind: string;
+      url: string | null;
+      muted: boolean;
+      fit: string;
+    }>
+  >([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(false);
@@ -102,13 +117,17 @@ function PlaylistEditor() {
     const [p, it, src] = await Promise.all([
       supabase.from("playlists").select("*").eq("id", id).maybeSingle(),
       supabase.from("playlist_items").select("*").eq("playlist_id", id).order("position"),
-      supabase.from("sources").select("id,name,kind,url,muted,fit").eq("org_id", org.org_id).order("name"),
+      supabase
+        .from("sources")
+        .select("id,name,kind,url,muted,fit")
+        .eq("org_id", org.org_id)
+        .order("name"),
     ]);
     if (p.error) toast.error(p.error.message);
     setPlaylist(p.data as Playlist | null);
     setItems((it.data ?? []) as unknown as Item[]);
     setSources((src.data ?? []) as typeof sources);
-    setSelectedId((prev) => prev ?? ((it.data?.[0]?.id as string | undefined) ?? null));
+    setSelectedId((prev) => prev ?? (it.data?.[0]?.id as string | undefined) ?? null);
     setLoading(false);
   }, [id, org]);
 
@@ -128,7 +147,10 @@ function PlaylistEditor() {
 
   const saveItem = async (itemId: string, patch: Partial<Item>) => {
     setItems((list) => list.map((i) => (i.id === itemId ? { ...i, ...patch } : i)));
-    const { error } = await supabase.from("playlist_items").update(patch as never).eq("id", itemId);
+    const { error } = await supabase
+      .from("playlist_items")
+      .update(patch as never)
+      .eq("id", itemId);
     if (error) toast.error(error.message);
   };
 
@@ -145,7 +167,10 @@ function PlaylistEditor() {
       })
       .select()
       .single();
-    if (error) { toast.error(error.message); return; }
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     setAdding(false);
     setItems((l) => [...l, data as unknown as Item]);
     setSelectedId(data.id as string);
@@ -170,7 +195,10 @@ function PlaylistEditor() {
       })
       .select()
       .single();
-    if (error) { toast.error(error.message); return; }
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     setItems((l) => [...l, data as unknown as Item]);
     toast.success("Item duplicado.");
   };
@@ -178,7 +206,10 @@ function PlaylistEditor() {
   const removeItem = async (item: Item) => {
     if (!confirm("Apagar este item?")) return;
     const { error } = await supabase.from("playlist_items").delete().eq("id", item.id);
-    if (error) { toast.error(error.message); return; }
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     setItems((l) => l.filter((i) => i.id !== item.id));
     if (selectedId === item.id) setSelectedId(null);
   };
@@ -191,7 +222,9 @@ function PlaylistEditor() {
     const next = arrayMove(items, oldIndex, newIndex);
     setItems(next);
     await Promise.all(
-      next.map((it, idx) => supabase.from("playlist_items").update({ position: idx }).eq("id", it.id)),
+      next.map((it, idx) =>
+        supabase.from("playlist_items").update({ position: idx }).eq("id", it.id),
+      ),
     );
   };
 
@@ -247,7 +280,12 @@ function PlaylistEditor() {
                 type="number"
                 disabled={!canEdit}
                 value={playlist.default_duration_s}
-                onChange={(e) => savePlaylist({ default_duration_s: Number(e.target.value) })}
+                min={1}
+                onChange={(e) => {
+                  const n = Math.round(Number(e.target.value));
+                  if (n >= 1) void savePlaylist({ default_duration_s: n });
+                  else setPlaylist({ ...playlist, default_duration_s: n });
+                }}
               />
             </div>
             <div className="space-y-1.5">
@@ -257,7 +295,9 @@ function PlaylistEditor() {
                 disabled={!canEdit}
                 onValueChange={(v) => savePlaylist({ transition: v })}
               >
-                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="fade">Suave</SelectItem>
                   <SelectItem value="none">Sem transição</SelectItem>
@@ -277,7 +317,10 @@ function PlaylistEditor() {
 
           <div className="rounded-lg border bg-card p-2">
             <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
-              <SortableContext items={items.map((i) => i.id)} strategy={verticalListSortingStrategy}>
+              <SortableContext
+                items={items.map((i) => i.id)}
+                strategy={verticalListSortingStrategy}
+              >
                 <div className="space-y-1">
                   {items.map((item) => (
                     <SortableRow
@@ -326,12 +369,17 @@ function PlaylistEditor() {
                         type="number"
                         disabled={!canEdit}
                         placeholder={
-                          selected.kind === "video" ? "vazio = até acabar" : `vazio = ${playlist.default_duration_s}s`
+                          selected.kind === "video"
+                            ? "vazio = até acabar"
+                            : `vazio = ${playlist.default_duration_s}s`
                         }
                         value={selected.duration_s ?? ""}
                         onChange={(e) =>
                           saveItem(selected.id, {
-                            duration_s: e.target.value === "" ? null : Number(e.target.value),
+                            duration_s:
+                              e.target.value === "" || Number(e.target.value) < 1
+                                ? null
+                                : Math.round(Number(e.target.value)),
                           })
                         }
                       />
@@ -361,7 +409,10 @@ function PlaylistEditor() {
                     <Button
                       onClick={async () => {
                         const err = validateData(selected.kind, selected.data);
-                        if (err) { toast.error(err); return; }
+                        if (err) {
+                          toast.error(err);
+                          return;
+                        }
                         await saveItem(selected.id, { data: selected.data });
                         toast.success("Item guardado.");
                       }}
@@ -379,7 +430,9 @@ function PlaylistEditor() {
                         type="date"
                         disabled={!canEdit}
                         value={selected.date_from ?? ""}
-                        onChange={(e) => saveItem(selected.id, { date_from: e.target.value || null })}
+                        onChange={(e) =>
+                          saveItem(selected.id, { date_from: e.target.value || null })
+                        }
                       />
                     </div>
                     <div className="space-y-1.5">
@@ -397,7 +450,9 @@ function PlaylistEditor() {
                         type="time"
                         disabled={!canEdit}
                         value={selected.time_from?.slice(0, 5) ?? ""}
-                        onChange={(e) => saveItem(selected.id, { time_from: e.target.value || null })}
+                        onChange={(e) =>
+                          saveItem(selected.id, { time_from: e.target.value || null })
+                        }
                       />
                     </div>
                     <div className="space-y-1.5">
@@ -422,11 +477,17 @@ function PlaylistEditor() {
                             onClick={() => {
                               const days = on
                                 ? selected.days.filter((x) => x !== d.n)
-                                : [...(selected.days ?? []), d.n].sort();
+                                : [...(selected.days ?? []), d.n].sort((a, b) => a - b);
+                              if (days.length === 0) {
+                                toast.error("Tem de ficar pelo menos um dia escolhido.");
+                                return;
+                              }
                               void saveItem(selected.id, { days });
                             }}
                             className={`rounded-full border px-3 py-1 text-sm ${
-                              on ? "border-accent bg-accent text-accent-foreground" : "bg-background"
+                              on
+                                ? "border-accent bg-accent text-accent-foreground"
+                                : "bg-background"
                             }`}
                           >
                             {d.l}
@@ -434,7 +495,9 @@ function PlaylistEditor() {
                         );
                       })}
                     </div>
-                    <p className="text-xs text-muted-foreground">Sem dias escolhidos = todos os dias.</p>
+                    <p className="text-xs text-muted-foreground">
+                      Por defeito passa todos os dias.
+                    </p>
                   </div>
                 </TabsContent>
               </Tabs>
