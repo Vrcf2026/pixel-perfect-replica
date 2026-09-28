@@ -51,7 +51,48 @@ export const SERVICE_TEMPLATES = [
   { value: "image_background", label: "Imagem de fundo" },
 ] as const;
 
-export type ItemData = Record<string, unknown>;
+// Campos possíveis de playlist_items.data (todos opcionais; variam por tipo).
+export type ItemData = {
+  accent?: unknown;
+  align?: unknown;
+  badge?: unknown;
+  badge_color?: unknown;
+  bg?: unknown;
+  bg_image_url?: unknown;
+  body?: unknown;
+  bullets?: unknown;
+  caption?: unknown;
+  category?: unknown;
+  description?: unknown;
+  fit?: unknown;
+  headers?: unknown;
+  icon?: unknown;
+  id?: unknown;
+  image_url?: unknown;
+  ken_burns?: unknown;
+  limit?: unknown;
+  map?: unknown;
+  muted?: unknown;
+  name?: unknown;
+  old_price?: unknown;
+  per_item_s?: unknown;
+  price?: unknown;
+  price_multiplier?: unknown;
+  price_suffix?: unknown;
+  qr_caption?: unknown;
+  qr_url?: unknown;
+  refresh_s?: unknown;
+  shuffle?: unknown;
+  size?: unknown;
+  source_id?: unknown;
+  subtitle?: unknown;
+  template?: unknown;
+  text_color?: unknown;
+  title?: unknown;
+  url?: unknown;
+  video_url?: unknown;
+  zoom?: unknown;
+};
 
 export function defaultData(kind: ItemKind): ItemData {
   switch (kind) {
@@ -85,7 +126,7 @@ export function defaultData(kind: ItemKind): ItemData {
 
 /** Devolve o erro de validação (ou null) para os campos obrigatórios do contrato. */
 export function validateData(kind: ItemKind, data: ItemData): string | null {
-  const s = (k: string) => String(data[k] ?? "").trim();
+  const s = (k: keyof ItemData) => String(data[k] ?? "").trim();
   switch (kind) {
     case "product":
       if (!s("name")) return "O produto precisa de nome.";

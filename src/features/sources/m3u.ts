@@ -1,8 +1,8 @@
 export type M3UChannel = {
   name: string;
   url: string;
-  logo?: string;
-  group?: string;
+  logo?: string | undefined;
+  group?: string | undefined;
   kind: "hls" | "ts";
 };
 
