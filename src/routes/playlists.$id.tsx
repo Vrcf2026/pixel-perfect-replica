@@ -106,7 +106,7 @@ function PlaylistEditor() {
     ]);
     if (p.error) toast.error(p.error.message);
     setPlaylist(p.data as Playlist | null);
-    setItems(((it.data ?? []) as unknown as Item[]) ?? []);
+    setItems((it.data ?? []) as unknown as Item[]);
     setSources((src.data ?? []) as typeof sources);
     setSelectedId((prev) => prev ?? ((it.data?.[0]?.id as string | undefined) ?? null));
     setLoading(false);
