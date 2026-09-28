@@ -126,7 +126,7 @@ export function defaultData(kind: ItemKind): ItemData {
 
 /** Devolve o erro de validação (ou null) para os campos obrigatórios do contrato. */
 export function validateData(kind: ItemKind, data: ItemData): string | null {
-  const s = (k: string) => String(data[k] ?? "").trim();
+  const s = (k: keyof ItemData) => String(data[k] ?? "").trim();
   switch (kind) {
     case "product":
       if (!s("name")) return "O produto precisa de nome.";

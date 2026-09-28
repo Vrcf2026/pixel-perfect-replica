@@ -1,4 +1,6 @@
-export type SlideData = Record<string, unknown>;
+import type { ItemData } from "@/features/playlists/contract";
+
+export type SlideData = ItemData;
 
 export type SlideProps = {
   data: SlideData;
