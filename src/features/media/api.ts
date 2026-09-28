@@ -50,9 +50,9 @@ function safeName(name: string) {
 }
 
 async function readDimensions(file: File): Promise<{
-  width?: number;
-  height?: number;
-  duration_s?: number;
+  width?: number | undefined;
+  height?: number | undefined;
+  duration_s?: number | undefined;
 }> {
   const url = URL.createObjectURL(file);
   try {
