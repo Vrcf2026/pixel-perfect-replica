@@ -3,11 +3,11 @@ import type { SlideProps } from "./types";
 const SIZES: Record<string, string> = { m: "5cqw", l: "7cqw", xl: "10cqw" };
 
 export function TextSlide({ data }: SlideProps) {
-  const bg = (data.bg as string) || "#0F1E36";
-  const text = (data.text_color as string) || "#FFFFFF";
-  const accent = (data.accent as string) || "#F28C28";
+  const bg = (data.bg as string) || "var(--m-primary, #0F1E36)";
+  const text = (data.text_color as string) || "var(--m-text, #FFFFFF)";
+  const accent = (data.accent as string) || "var(--m-accent, #F28C28)";
   const align = (data.align as string) === "left" ? "left" : "center";
-  const size = SIZES[(data.size as string) || "l"] ?? SIZES['l'];
+  const size = SIZES[(data.size as string) || "l"] ?? SIZES["l"];
 
   return (
     <div
@@ -16,7 +16,11 @@ export function TextSlide({ data }: SlideProps) {
     >
       {data.bg_image_url ? (
         <>
-          <img src={String(data.bg_image_url)} alt="" className="absolute inset-0 h-full w-full object-cover" />
+          <img
+            src={String(data.bg_image_url)}
+            alt=""
+            className="absolute inset-0 h-full w-full object-cover"
+          />
           <div className="absolute inset-0 bg-black/55" />
         </>
       ) : null}

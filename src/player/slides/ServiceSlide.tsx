@@ -14,9 +14,9 @@ function Icon({ name, color }: { name?: string; color: string }) {
 }
 
 export function ServiceSlide({ data }: SlideProps) {
-  const bg = (data.bg as string) || "#0F1E36";
-  const text = (data.text_color as string) || "#FFFFFF";
-  const accent = (data.accent as string) || "#F28C28";
+  const bg = (data.bg as string) || "var(--m-primary, #0F1E36)";
+  const text = (data.text_color as string) || "var(--m-text, #FFFFFF)";
+  const accent = (data.accent as string) || "var(--m-accent, #F28C28)";
   const template = (data.template as string) || "big_title";
   const image = data.image_url as string | undefined;
   const bullets = Array.isArray(data.bullets) ? (data.bullets as string[]) : [];

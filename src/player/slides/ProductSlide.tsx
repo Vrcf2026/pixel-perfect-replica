@@ -3,9 +3,19 @@ import { QrImage } from "@/player/components/QrImage";
 import type { SlideProps } from "./types";
 
 export function ProductSlide({ data }: SlideProps) {
-  const bg = (data.bg as string) || "#0F1E36";
-  const text = (data.text_color as string) || "#FFFFFF";
-  const accent = (data.accent as string) || "#F28C28";
+  const money = {
+    currency:
+      typeof (data as Record<string, unknown>)["currency"] === "string"
+        ? String((data as Record<string, unknown>)["currency"])
+        : "EUR",
+    locale:
+      typeof (data as Record<string, unknown>)["locale"] === "string"
+        ? String((data as Record<string, unknown>)["locale"])
+        : "pt-PT",
+  };
+  const bg = (data.bg as string) || "var(--m-primary, #0F1E36)";
+  const text = (data.text_color as string) || "var(--m-text, #FFFFFF)";
+  const accent = (data.accent as string) || "var(--m-accent, #F28C28)";
   const template = (data.template as string) || "photo_left";
   const image = data.image_url as string | undefined;
 
@@ -24,10 +34,12 @@ export function ProductSlide({ data }: SlideProps) {
       ) : null}
       <div className="mt-[1%] flex items-end gap-[2%]">
         {data.old_price ? (
-          <span className="text-[3cqw] line-through opacity-50">{formatPrice(data.old_price)}</span>
+          <span className="text-[3cqw] line-through opacity-50">
+            {formatPrice(data.old_price, money)}
+          </span>
         ) : null}
         <span className="font-display text-[8cqw] leading-none font-bold" style={{ color: accent }}>
-          {formatPrice(data.price)}
+          {formatPrice(data.price, money)}
         </span>
         {data.price_suffix ? (
           <span className="pb-[1%] text-[2.4cqw] opacity-70">{String(data.price_suffix)}</span>

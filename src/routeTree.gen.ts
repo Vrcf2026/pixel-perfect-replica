@@ -13,14 +13,17 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AparenciaRouteImport } from './routes/aparencia'
 import { Route as BibliotecaRouteImport } from './routes/biblioteca'
 import { Route as DefinicoesRouteImport } from './routes/definicoes'
-import { Route as EcrasRouteImport } from './routes/ecras'
 import { Route as FontesRouteImport } from './routes/fontes'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as UtilizadoresRouteImport } from './routes/utilizadores'
+import { Route as EcrasIndexRouteImport } from './routes/ecras.index'
+import { Route as EcrasIdRouteImport } from './routes/ecras.$id'
 import { Route as LayoutsIndexRouteImport } from './routes/layouts.index'
 import { Route as LayoutsIdRouteImport } from './routes/layouts.$id'
+import { Route as PlayerTokenRouteImport } from './routes/player.$token'
 import { Route as PlaylistsIndexRouteImport } from './routes/playlists.index'
 import { Route as PlaylistsIdRouteImport } from './routes/playlists.$id'
+import { Route as PreviewLayoutIdRouteImport } from './routes/preview.layout.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -42,11 +45,6 @@ const DefinicoesRoute = DefinicoesRouteImport.update({
   path: '/definicoes',
   getParentRoute: () => rootRouteImport,
 } as any)
-const EcrasRoute = EcrasRouteImport.update({
-  id: '/ecras',
-  path: '/ecras',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const FontesRoute = FontesRouteImport.update({
   id: '/fontes',
   path: '/fontes',
@@ -62,6 +60,16 @@ const UtilizadoresRoute = UtilizadoresRouteImport.update({
   path: '/utilizadores',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EcrasIndexRoute = EcrasIndexRouteImport.update({
+  id: '/ecras/',
+  path: '/ecras/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EcrasIdRoute = EcrasIdRouteImport.update({
+  id: '/ecras/$id',
+  path: '/ecras/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LayoutsIndexRoute = LayoutsIndexRouteImport.update({
   id: '/layouts/',
   path: '/layouts/',
@@ -70,6 +78,11 @@ const LayoutsIndexRoute = LayoutsIndexRouteImport.update({
 const LayoutsIdRoute = LayoutsIdRouteImport.update({
   id: '/layouts/$id',
   path: '/layouts/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlayerTokenRoute = PlayerTokenRouteImport.update({
+  id: '/player/$token',
+  path: '/player/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PlaylistsIndexRoute = PlaylistsIndexRouteImport.update({
@@ -82,34 +95,45 @@ const PlaylistsIdRoute = PlaylistsIdRouteImport.update({
   path: '/playlists/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PreviewLayoutIdRoute = PreviewLayoutIdRouteImport.update({
+  id: '/preview/layout/$id',
+  path: '/preview/layout/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/aparencia': typeof AparenciaRoute
   '/biblioteca': typeof BibliotecaRoute
   '/definicoes': typeof DefinicoesRoute
-  '/ecras': typeof EcrasRoute
   '/fontes': typeof FontesRoute
   '/login': typeof LoginRoute
   '/utilizadores': typeof UtilizadoresRoute
+  '/ecras/$id': typeof EcrasIdRoute
   '/layouts/$id': typeof LayoutsIdRoute
+  '/player/$token': typeof PlayerTokenRoute
   '/playlists/$id': typeof PlaylistsIdRoute
+  '/ecras/': typeof EcrasIndexRoute
   '/layouts/': typeof LayoutsIndexRoute
   '/playlists/': typeof PlaylistsIndexRoute
+  '/preview/layout/$id': typeof PreviewLayoutIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/aparencia': typeof AparenciaRoute
   '/biblioteca': typeof BibliotecaRoute
   '/definicoes': typeof DefinicoesRoute
-  '/ecras': typeof EcrasRoute
   '/fontes': typeof FontesRoute
   '/login': typeof LoginRoute
   '/utilizadores': typeof UtilizadoresRoute
+  '/ecras/$id': typeof EcrasIdRoute
   '/layouts/$id': typeof LayoutsIdRoute
+  '/player/$token': typeof PlayerTokenRoute
   '/playlists/$id': typeof PlaylistsIdRoute
+  '/ecras': typeof EcrasIndexRoute
   '/layouts': typeof LayoutsIndexRoute
   '/playlists': typeof PlaylistsIndexRoute
+  '/preview/layout/$id': typeof PreviewLayoutIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -117,14 +141,17 @@ export interface FileRoutesById {
   '/aparencia': typeof AparenciaRoute
   '/biblioteca': typeof BibliotecaRoute
   '/definicoes': typeof DefinicoesRoute
-  '/ecras': typeof EcrasRoute
   '/fontes': typeof FontesRoute
   '/login': typeof LoginRoute
   '/utilizadores': typeof UtilizadoresRoute
+  '/ecras/$id': typeof EcrasIdRoute
   '/layouts/$id': typeof LayoutsIdRoute
+  '/player/$token': typeof PlayerTokenRoute
   '/playlists/$id': typeof PlaylistsIdRoute
+  '/ecras/': typeof EcrasIndexRoute
   '/layouts/': typeof LayoutsIndexRoute
   '/playlists/': typeof PlaylistsIndexRoute
+  '/preview/layout/$id': typeof PreviewLayoutIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -133,42 +160,51 @@ export interface FileRouteTypes {
     | '/aparencia'
     | '/biblioteca'
     | '/definicoes'
-    | '/ecras'
     | '/fontes'
     | '/login'
     | '/utilizadores'
+    | '/ecras/$id'
     | '/layouts/$id'
+    | '/player/$token'
     | '/playlists/$id'
+    | '/ecras/'
     | '/layouts/'
     | '/playlists/'
+    | '/preview/layout/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/aparencia'
     | '/biblioteca'
     | '/definicoes'
-    | '/ecras'
     | '/fontes'
     | '/login'
     | '/utilizadores'
+    | '/ecras/$id'
     | '/layouts/$id'
+    | '/player/$token'
     | '/playlists/$id'
+    | '/ecras'
     | '/layouts'
     | '/playlists'
+    | '/preview/layout/$id'
   id:
     | '__root__'
     | '/'
     | '/aparencia'
     | '/biblioteca'
     | '/definicoes'
-    | '/ecras'
     | '/fontes'
     | '/login'
     | '/utilizadores'
+    | '/ecras/$id'
     | '/layouts/$id'
+    | '/player/$token'
     | '/playlists/$id'
+    | '/ecras/'
     | '/layouts/'
     | '/playlists/'
+    | '/preview/layout/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -176,14 +212,17 @@ export interface RootRouteChildren {
   AparenciaRoute: typeof AparenciaRoute
   BibliotecaRoute: typeof BibliotecaRoute
   DefinicoesRoute: typeof DefinicoesRoute
-  EcrasRoute: typeof EcrasRoute
   FontesRoute: typeof FontesRoute
   LoginRoute: typeof LoginRoute
   UtilizadoresRoute: typeof UtilizadoresRoute
+  EcrasIdRoute: typeof EcrasIdRoute
   LayoutsIdRoute: typeof LayoutsIdRoute
+  PlayerTokenRoute: typeof PlayerTokenRoute
   PlaylistsIdRoute: typeof PlaylistsIdRoute
+  EcrasIndexRoute: typeof EcrasIndexRoute
   LayoutsIndexRoute: typeof LayoutsIndexRoute
   PlaylistsIndexRoute: typeof PlaylistsIndexRoute
+  PreviewLayoutIdRoute: typeof PreviewLayoutIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -216,13 +255,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DefinicoesRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/ecras': {
-      id: '/ecras'
-      path: '/ecras'
-      fullPath: '/ecras'
-      preLoaderRoute: typeof EcrasRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/fontes': {
       id: '/fontes'
       path: '/fontes'
@@ -244,6 +276,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UtilizadoresRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/ecras/': {
+      id: '/ecras/'
+      path: '/ecras'
+      fullPath: '/ecras/'
+      preLoaderRoute: typeof EcrasIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ecras/$id': {
+      id: '/ecras/$id'
+      path: '/ecras/$id'
+      fullPath: '/ecras/$id'
+      preLoaderRoute: typeof EcrasIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/layouts/': {
       id: '/layouts/'
       path: '/layouts'
@@ -256,6 +302,13 @@ declare module '@tanstack/react-router' {
       path: '/layouts/$id'
       fullPath: '/layouts/$id'
       preLoaderRoute: typeof LayoutsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/player/$token': {
+      id: '/player/$token'
+      path: '/player/$token'
+      fullPath: '/player/$token'
+      preLoaderRoute: typeof PlayerTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/playlists/': {
@@ -272,6 +325,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PlaylistsIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/preview/layout/$id': {
+      id: '/preview/layout/$id'
+      path: '/preview/layout/$id'
+      fullPath: '/preview/layout/$id'
+      preLoaderRoute: typeof PreviewLayoutIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -280,14 +340,17 @@ const rootRouteChildren: RootRouteChildren = {
   AparenciaRoute: AparenciaRoute,
   BibliotecaRoute: BibliotecaRoute,
   DefinicoesRoute: DefinicoesRoute,
-  EcrasRoute: EcrasRoute,
   FontesRoute: FontesRoute,
   LoginRoute: LoginRoute,
   UtilizadoresRoute: UtilizadoresRoute,
+  EcrasIdRoute: EcrasIdRoute,
   LayoutsIdRoute: LayoutsIdRoute,
+  PlayerTokenRoute: PlayerTokenRoute,
   PlaylistsIdRoute: PlaylistsIdRoute,
+  EcrasIndexRoute: EcrasIndexRoute,
   LayoutsIndexRoute: LayoutsIndexRoute,
   PlaylistsIndexRoute: PlaylistsIndexRoute,
+  PreviewLayoutIdRoute: PreviewLayoutIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

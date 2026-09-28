@@ -177,6 +177,12 @@ function LayoutEditorPage() {
       actions={
         <>
           <SaveBadge state={ed.saveState} />
+          <a href={`/preview/layout/${id}`} target="_blank" rel="noreferrer">
+            <Button variant="outline">
+              <MonitorPlay className="mr-2 h-4 w-4" />
+              Pré-visualizar
+            </Button>
+          </a>
           <Link to="/layouts">
             <Button variant="ghost">
               <ArrowLeft className="mr-2 h-4 w-4" />

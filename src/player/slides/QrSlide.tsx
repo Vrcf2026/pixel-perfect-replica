@@ -3,8 +3,8 @@ import QRCode from "qrcode";
 import type { SlideProps } from "./types";
 
 export function QrSlide({ data }: SlideProps) {
-  const bg = (data.bg as string) || "#0F1E36";
-  const text = (data.text_color as string) || "#FFFFFF";
+  const bg = (data.bg as string) || "var(--m-primary, #0F1E36)";
+  const text = (data.text_color as string) || "var(--m-text, #FFFFFF)";
   const url = String(data.url ?? "");
   const [png, setPng] = useState<string>("");
 

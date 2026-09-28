@@ -10,4 +10,4 @@
 ## Por fazer (a pedido do utilizador)
 
 - [x] Fase 2 — layouts: lista com miniaturas, 10 modelos (horizontal e vertical), editor visual com zonas (arrastar, redimensionar, camadas, ocultar/bloquear, atalhos), propriedades por tipo, estilo, guardar automático e "Ver conteúdo"
-- [ ] Fase 3 — ecrãs, horários, aparência e player (usar src/player/zones/* e src/player/components/SourceView.tsx já existentes)
+- [x] Fase 3 — ecrãs (estado, link, QR, comandos remotos, novo token, pré-visualização ao vivo, avisos), horários com vista semanal, aparência (tema, logótipo, fontes, moeda), painel inicial, player /player/$token (cache offline, ping, comandos, recarga diária, wake lock, service worker de media) e /preview/layout/$id
