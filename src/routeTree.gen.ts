@@ -16,7 +16,7 @@ import { Route as DefinicoesRouteImport } from './routes/definicoes'
 import { Route as EcrasRouteImport } from './routes/ecras'
 import { Route as FontesRouteImport } from './routes/fontes'
 import { Route as LoginRouteImport } from './routes/login'
-import { Route as RegistoRouteImport } from './routes/registo'
+import { Route as UtilizadoresRouteImport } from './routes/utilizadores'
 import { Route as LayoutsIndexRouteImport } from './routes/layouts.index'
 import { Route as LayoutsIdRouteImport } from './routes/layouts.$id'
 import { Route as PlaylistsIndexRouteImport } from './routes/playlists.index'
@@ -57,9 +57,9 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
-const RegistoRoute = RegistoRouteImport.update({
-  id: '/registo',
-  path: '/registo',
+const UtilizadoresRoute = UtilizadoresRouteImport.update({
+  id: '/utilizadores',
+  path: '/utilizadores',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LayoutsIndexRoute = LayoutsIndexRouteImport.update({
@@ -91,7 +91,7 @@ export interface FileRoutesByFullPath {
   '/ecras': typeof EcrasRoute
   '/fontes': typeof FontesRoute
   '/login': typeof LoginRoute
-  '/registo': typeof RegistoRoute
+  '/utilizadores': typeof UtilizadoresRoute
   '/layouts/$id': typeof LayoutsIdRoute
   '/playlists/$id': typeof PlaylistsIdRoute
   '/layouts/': typeof LayoutsIndexRoute
@@ -105,7 +105,7 @@ export interface FileRoutesByTo {
   '/ecras': typeof EcrasRoute
   '/fontes': typeof FontesRoute
   '/login': typeof LoginRoute
-  '/registo': typeof RegistoRoute
+  '/utilizadores': typeof UtilizadoresRoute
   '/layouts/$id': typeof LayoutsIdRoute
   '/playlists/$id': typeof PlaylistsIdRoute
   '/layouts': typeof LayoutsIndexRoute
@@ -120,7 +120,7 @@ export interface FileRoutesById {
   '/ecras': typeof EcrasRoute
   '/fontes': typeof FontesRoute
   '/login': typeof LoginRoute
-  '/registo': typeof RegistoRoute
+  '/utilizadores': typeof UtilizadoresRoute
   '/layouts/$id': typeof LayoutsIdRoute
   '/playlists/$id': typeof PlaylistsIdRoute
   '/layouts/': typeof LayoutsIndexRoute
@@ -136,7 +136,7 @@ export interface FileRouteTypes {
     | '/ecras'
     | '/fontes'
     | '/login'
-    | '/registo'
+    | '/utilizadores'
     | '/layouts/$id'
     | '/playlists/$id'
     | '/layouts/'
@@ -150,7 +150,7 @@ export interface FileRouteTypes {
     | '/ecras'
     | '/fontes'
     | '/login'
-    | '/registo'
+    | '/utilizadores'
     | '/layouts/$id'
     | '/playlists/$id'
     | '/layouts'
@@ -164,7 +164,7 @@ export interface FileRouteTypes {
     | '/ecras'
     | '/fontes'
     | '/login'
-    | '/registo'
+    | '/utilizadores'
     | '/layouts/$id'
     | '/playlists/$id'
     | '/layouts/'
@@ -179,7 +179,7 @@ export interface RootRouteChildren {
   EcrasRoute: typeof EcrasRoute
   FontesRoute: typeof FontesRoute
   LoginRoute: typeof LoginRoute
-  RegistoRoute: typeof RegistoRoute
+  UtilizadoresRoute: typeof UtilizadoresRoute
   LayoutsIdRoute: typeof LayoutsIdRoute
   PlaylistsIdRoute: typeof PlaylistsIdRoute
   LayoutsIndexRoute: typeof LayoutsIndexRoute
@@ -237,11 +237,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/registo': {
-      id: '/registo'
-      path: '/registo'
-      fullPath: '/registo'
-      preLoaderRoute: typeof RegistoRouteImport
+    '/utilizadores': {
+      id: '/utilizadores'
+      path: '/utilizadores'
+      fullPath: '/utilizadores'
+      preLoaderRoute: typeof UtilizadoresRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/layouts/': {
@@ -283,7 +283,7 @@ const rootRouteChildren: RootRouteChildren = {
   EcrasRoute: EcrasRoute,
   FontesRoute: FontesRoute,
   LoginRoute: LoginRoute,
-  RegistoRoute: RegistoRoute,
+  UtilizadoresRoute: UtilizadoresRoute,
   LayoutsIdRoute: LayoutsIdRoute,
   PlaylistsIdRoute: PlaylistsIdRoute,
   LayoutsIndexRoute: LayoutsIndexRoute,

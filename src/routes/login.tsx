@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/features/auth/AuthContext";
@@ -83,10 +83,7 @@ function LoginPage() {
             </Button>
           </form>
           <p className="mt-4 text-center text-sm text-muted-foreground">
-            Ainda não tem conta?{" "}
-            <Link to="/registo" className="font-medium underline">
-              Criar conta
-            </Link>
+            Sem conta? Peça acesso ao administrador.
           </p>
         </CardContent>
       </Card>

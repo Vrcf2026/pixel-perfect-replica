@@ -569,6 +569,27 @@ export type Database = {
           },
         ]
       }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -582,6 +603,13 @@ export type Database = {
       }
       create_organization: { Args: { p_name: string }; Returns: string }
       get_player_config: { Args: { p_token: string }; Returns: Json }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
       is_member: {
         Args: { p_org: string; p_roles?: string[] }
         Returns: boolean
@@ -589,6 +617,7 @@ export type Database = {
       player_ping: { Args: { p_info?: Json; p_token: string }; Returns: Json }
     }
     Enums: {
+      app_role: "superadmin"
       item_kind:
         | "product"
         | "image"
@@ -743,6 +772,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      app_role: ["superadmin"],
       item_kind: [
         "product",
         "image",
