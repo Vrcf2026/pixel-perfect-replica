@@ -229,7 +229,10 @@ export type Database = {
           created_at: string
           id: string
           logo_url: string | null
+          max_screens: number | null
           name: string
+          notes: string | null
+          suspended: boolean
           theme: Json
         }
         Insert: {
@@ -237,7 +240,10 @@ export type Database = {
           created_at?: string
           id?: string
           logo_url?: string | null
+          max_screens?: number | null
           name: string
+          notes?: string | null
+          suspended?: boolean
           theme?: Json
         }
         Update: {
@@ -245,7 +251,10 @@ export type Database = {
           created_at?: string
           id?: string
           logo_url?: string | null
+          max_screens?: number | null
           name?: string
+          notes?: string | null
+          suspended?: boolean
           theme?: Json
         }
         Relationships: []
@@ -597,6 +606,10 @@ export type Database = {
     Functions: {
       _active_layout: { Args: { p_screen: string }; Returns: string }
       _screen_version: { Args: { p_screen: string }; Returns: string }
+      admin_create_organization: {
+        Args: { p_max_screens?: number; p_name: string; p_notes?: string }
+        Returns: string
+      }
       assert_same_org: {
         Args: { p_id: string; p_org: string; p_table: string }
         Returns: undefined
@@ -614,6 +627,7 @@ export type Database = {
         Args: { p_org: string; p_roles?: string[] }
         Returns: boolean
       }
+      is_superadmin: { Args: never; Returns: boolean }
       player_ping: { Args: { p_info?: Json; p_token: string }; Returns: Json }
     }
     Enums: {
