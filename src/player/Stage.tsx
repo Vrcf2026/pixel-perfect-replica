@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { ZoneView } from "./ZoneView";
+import { CampaignOverlay } from "./CampaignOverlay";
 import { PLAYER_KEYFRAMES } from "./PlaylistRunner";
 import { ensureFonts, mergeTheme, themeVars } from "./lib/theme";
 import type { PlayerConfig } from "./lib/types";
@@ -60,6 +61,7 @@ export function Stage({ config, overlay }: { config: PlayerConfig; overlay?: Rea
         ) : (
           <NoLayout name={config.org.name} logo={config.org.logo_url} />
         )}
+        <CampaignOverlay campaigns={config.campaigns} />
         {overlay}
       </div>
     </div>

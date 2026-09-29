@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useOrg } from "@/features/org/OrgContext";
 import { useAuth } from "@/features/auth/AuthContext";
 import { AppShell } from "@/components/AppShell";
+import { AlertEmailsCard } from "@/features/org/AlertEmailsCard";
 
 export const Route = createFileRoute("/definicoes")({
   head: () => ({
@@ -22,7 +23,7 @@ const ROLE_LABEL: Record<string, string> = {
 };
 
 function DefinicoesPage() {
-  const { org, role } = useOrg();
+  const { org, role, canEdit } = useOrg();
   const { user } = useAuth();
 
   return (
@@ -41,6 +42,11 @@ function DefinicoesPage() {
           <div className="font-medium">{role ? ROLE_LABEL[role] : "—"}</div>
         </div>
       </div>
+      {org ? (
+        <div className="mt-4">
+          <AlertEmailsCard orgId={org.org_id} canEdit={canEdit} />
+        </div>
+      ) : null}
     </AppShell>
   );
 }

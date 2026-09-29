@@ -26,6 +26,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { QrImage } from "@/player/components/QrImage";
 import { ScreenForm, orientationOf, type ScreenFormValue } from "@/features/screens/ScreenForm";
 import { KioskHelp } from "@/features/screens/KioskHelp";
+import { OpenHoursCard, type OpenHours } from "@/features/screens/OpenHoursCard";
 import { WeekView, type ScheduleRow } from "@/features/screens/WeekView";
 import {
   EMPTY_SCHEDULE,
@@ -219,6 +220,13 @@ function ScreenPage() {
   const errors = (info["errors"] as Array<{ at: string; msg: string }> | undefined) ?? [];
   const portrait = screen.height > screen.width;
   const override = (screen.theme_override ?? {}) as Record<string, string>;
+  const raw = screen as unknown as Partial<OpenHours>;
+  const hours: OpenHours = {
+    open_days: raw.open_days ?? [1, 2, 3, 4, 5, 6],
+    open_from: raw.open_from ?? "09:00",
+    open_to: raw.open_to ?? "19:00",
+    alerts_enabled: raw.alerts_enabled ?? true,
+  };
 
   return (
     <AppShell
@@ -337,6 +345,13 @@ function ScreenPage() {
                   </Button>
                 </div>
               </fieldset>
+
+              <OpenHoursCard
+                screenId={screen.id}
+                initial={hours}
+                canEdit={canEdit}
+                onSaved={() => void load()}
+              />
             </div>
 
             <div className="space-y-4">
@@ -564,7 +579,7 @@ function ScreenPage() {
 
         <TabsContent value="instalar">
           <div className="rounded-lg border bg-card p-4">
-            <KioskHelp url={url} />
+            <KioskHelp url={url} hours={hours} />
           </div>
         </TabsContent>
       </Tabs>

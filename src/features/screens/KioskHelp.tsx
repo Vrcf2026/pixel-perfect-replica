@@ -3,6 +3,29 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
+function hm(t: string, deltaMin: number) {
+  const [h, m] = t.split(":").map(Number);
+  const total = ((h ?? 0) * 60 + (m ?? 0) + deltaMin + 1440) % 1440;
+  return { h: Math.floor(total / 60), m: total % 60 };
+}
+
+export function cecCron(hours: {
+  open_days: number[];
+  open_from: string | null;
+  open_to: string | null;
+}) {
+  const days = hours.open_days
+    .map((d) => d % 7)
+    .sort((a, b) => a - b)
+    .join(",");
+  const on = hm(hours.open_from ?? "09:00", -5);
+  const off = hm(hours.open_to ?? "19:00", 10);
+  return `# sudo apt install -y cec-utils
+${on.m} ${on.h} * * ${days} echo 'on 0' | cec-client -s -d 1
+${on.m} ${on.h} * * ${days} echo 'as' | cec-client -s -d 1
+${off.m} ${off.h} * * ${days} echo 'standby 0' | cec-client -s -d 1`;
+}
+
 function Block({ text }: { text: string }) {
   return (
     <div className="relative">
@@ -24,7 +47,13 @@ function Block({ text }: { text: string }) {
   );
 }
 
-export function KioskHelp({ url }: { url: string }) {
+export function KioskHelp({
+  url,
+  hours,
+}: {
+  url: string;
+  hours?: { open_days: number[]; open_from: string | null; open_to: string | null };
+}) {
   const flags =
     "--kiosk --autoplay-policy=no-user-gesture-required --noerrdialogs --disable-infobars";
   const chrome = `"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe" ${flags} --disable-session-crashed-bubble --overscroll-history-navigation=0 ${url}`;
@@ -55,6 +84,16 @@ Exec=chromium-browser ${flags} --check-for-update-interval=31536000 ${url}`;
         <Block text={edge} />
       </TabsContent>
       <TabsContent value="pi" className="space-y-3 pt-2 text-sm">
+        {hours?.open_from && hours.open_to ? (
+          <>
+            <p className="text-muted-foreground">
+              <b>Ligar e desligar a TV sozinha</b> (HDMI-CEC): instale o <code>cec-utils</code> e
+              acrescente ao <code>crontab -e</code>. Liga 5 minutos antes de abrir e desliga 10
+              minutos depois de fechar.
+            </p>
+            <Block text={cecCron(hours)} />
+          </>
+        ) : null}
         <p className="text-muted-foreground">
           Raspberry Pi OS com ambiente gráfico. Grave como{" "}
           <code>~/.config/autostart/montra.desktop</code> e desative o "screen blanking" em{" "}

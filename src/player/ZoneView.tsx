@@ -2,6 +2,8 @@ import { SourceView } from "@/player/components/SourceView";
 import { TickerZone } from "@/player/zones/TickerZone";
 import { ClockZone } from "@/player/zones/ClockZone";
 import { LogoZone, QrZone, TextZone, WebpageZone } from "@/player/zones/SimpleZones";
+import { WeatherZone } from "@/player/zones/WeatherZone";
+import { RssZone } from "@/player/zones/RssZone";
 import { zoneBoxStyle, zoneInnerStyle } from "@/player/zones/style";
 import type { Orientation } from "@/player/zones/types";
 import { PlaylistRunner } from "./PlaylistRunner";
@@ -62,6 +64,10 @@ function Content({
       return <QrZone config={c} />;
     case "webpage":
       return <WebpageZone config={c} />;
+    case "weather":
+      return <WeatherZone config={c} />;
+    case "rss":
+      return <RssZone zoneId={zone.id} config={c} />;
     default:
       return null;
   }

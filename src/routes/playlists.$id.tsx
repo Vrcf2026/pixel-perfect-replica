@@ -15,13 +15,15 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { ArrowLeft, Copy, GripVertical, Loader2, Play, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, Copy, GripVertical, Loader2, Play, Plus, Sparkles, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useOrg } from "@/features/org/OrgContext";
 import { AppShell } from "@/components/AppShell";
 import { Slide, SlideFrame } from "@/player/slides";
 import { ItemForm } from "@/features/playlists/ItemForm";
+import { PRESETS } from "@/features/playlists/presets";
+import { AdAssistant } from "@/features/playlists/AdAssistant";
 import {
   ITEM_KINDS,
   KIND_META,
@@ -109,6 +111,7 @@ function PlaylistEditor() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(false);
+  const [assistantOpen, setAssistantOpen] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
 
   const load = useCallback(async () => {
@@ -154,16 +157,21 @@ function PlaylistEditor() {
     if (error) toast.error(error.message);
   };
 
-  const addItem = async (kind: ItemKind) => {
+  const addItem = async (
+    kind: ItemKind,
+    data?: Record<string, unknown>,
+    extra?: { duration_s?: number | null },
+  ) => {
     if (!org || !playlist) return;
-    const { data, error } = await supabase
+    const { data: row, error } = await supabase
       .from("playlist_items")
       .insert({
         org_id: org.org_id,
         playlist_id: playlist.id,
         kind,
-        data: defaultData(kind) as never,
+        data: (data ?? defaultData(kind)) as never,
         position: items.length,
+        ...(extra?.duration_s ? { duration_s: extra.duration_s } : {}),
       })
       .select()
       .single();
@@ -172,8 +180,9 @@ function PlaylistEditor() {
       return;
     }
     setAdding(false);
-    setItems((l) => [...l, data as unknown as Item]);
-    setSelectedId(data.id as string);
+    setAssistantOpen(false);
+    setItems((l) => [...l, row as unknown as Item]);
+    setSelectedId(row.id as string);
   };
 
   const duplicate = async (item: Item) => {
@@ -340,10 +349,19 @@ function PlaylistEditor() {
               <p className="p-4 text-center text-sm text-muted-foreground">Sem itens.</p>
             ) : null}
             {canEdit ? (
-              <Button variant="outline" className="mt-2 w-full" onClick={() => setAdding(true)}>
-                <Plus className="mr-2 h-4 w-4" />
-                Adicionar item
-              </Button>
+              <div className="mt-2 grid grid-cols-2 gap-2">
+                <Button variant="outline" onClick={() => setAdding(true)}>
+                  <Plus className="mr-2 h-4 w-4" />
+                  Adicionar
+                </Button>
+                <Button
+                  className="bg-[#F28C28] text-[#0F1E36] hover:bg-[#F28C28]/90"
+                  onClick={() => setAssistantOpen(true)}
+                >
+                  <Sparkles className="mr-2 h-4 w-4" />
+                  Assistente
+                </Button>
+              </div>
             ) : null}
           </div>
         </div>
@@ -509,28 +527,63 @@ function PlaylistEditor() {
       </div>
 
       <Dialog open={adding} onOpenChange={setAdding}>
-        <DialogContent>
+        <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Que tipo de item?</DialogTitle>
+            <DialogTitle>Acrescentar à playlist</DialogTitle>
           </DialogHeader>
-          <div className="grid grid-cols-3 gap-3">
-            {ITEM_KINDS.map((k) => {
-              const meta = KIND_META[k];
-              return (
-                <button
-                  key={k}
-                  onClick={() => addItem(k)}
-                  className="flex flex-col items-center gap-2 rounded-lg border p-4 text-center hover:border-accent"
-                >
-                  <meta.icon className="h-5 w-5 text-accent" />
-                  <span className="text-sm font-medium">{meta.label}</span>
-                  <span className="text-[11px] text-muted-foreground">{meta.hint}</span>
-                </button>
-              );
-            })}
-          </div>
+          <Tabs defaultValue="modelos">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="modelos">Modelos prontos</TabsTrigger>
+              <TabsTrigger value="tipos">Em branco</TabsTrigger>
+            </TabsList>
+            <TabsContent value="modelos" className="pt-3">
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                {PRESETS.map((p) => {
+                  const meta = KIND_META[p.kind];
+                  return (
+                    <button
+                      key={p.id}
+                      onClick={() => addItem(p.kind, p.data, { duration_s: p.duration_s ?? null })}
+                      className="flex flex-col items-start gap-1.5 rounded-lg border p-3 text-left hover:border-accent"
+                    >
+                      <meta.icon className="h-4 w-4 text-accent" />
+                      <span className="text-sm font-medium">{p.label}</span>
+                      <span className="text-[11px] text-muted-foreground">{p.hint}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </TabsContent>
+            <TabsContent value="tipos" className="pt-3">
+              <div className="grid grid-cols-3 gap-3">
+                {ITEM_KINDS.map((k) => {
+                  const meta = KIND_META[k];
+                  return (
+                    <button
+                      key={k}
+                      onClick={() => addItem(k)}
+                      className="flex flex-col items-center gap-2 rounded-lg border p-4 text-center hover:border-accent"
+                    >
+                      <meta.icon className="h-5 w-5 text-accent" />
+                      <span className="text-sm font-medium">{meta.label}</span>
+                      <span className="text-[11px] text-muted-foreground">{meta.hint}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </TabsContent>
+          </Tabs>
         </DialogContent>
       </Dialog>
+
+      {org && playlist ? (
+        <AdAssistant
+          open={assistantOpen}
+          onClose={() => setAssistantOpen(false)}
+          orgId={org.org_id}
+          onAdd={(kind, data) => addItem(kind, data)}
+        />
+      ) : null}
 
       <PreviewDialog
         open={previewOpen}

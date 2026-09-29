@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { ArrowDown, ArrowUp, Plus, Trash2 } from "lucide-react";
 import { MediaPicker } from "@/features/media/MediaPicker";
 import { Button } from "@/components/ui/button";
@@ -604,6 +605,66 @@ export function Inspector({ zone, readOnly, sources, playlists, onChange }: Prop
             </>
           ) : null}
 
+          {zone.kind === "weather" ? <WeatherFields c={c} setC={setC} /> : null}
+
+          {zone.kind === "rss" ? (
+            <>
+              <Field
+                label="Endereço do feed RSS"
+                hint="Ex.: https://observador.pt/feed/ — a maioria dos jornais tem um."
+              >
+                <Input
+                  value={c.url ?? ""}
+                  placeholder="https://…"
+                  onChange={(e) => setC({ url: e.target.value })}
+                />
+              </Field>
+              <Field label="Nome da fonte (opcional)" hint="Vazio = usa o nome do feed.">
+                <Input
+                  value={c.source_label ?? ""}
+                  onChange={(e) => setC({ source_label: e.target.value })}
+                />
+              </Field>
+              <div className="grid grid-cols-2 gap-2">
+                <Field label="Apresentação">
+                  <Pick
+                    value={c.mode ?? "headline"}
+                    onChange={(mode) => setC({ mode })}
+                    options={[
+                      { value: "headline", label: "Uma manchete de cada vez" },
+                      { value: "ticker", label: "Rodapé a correr" },
+                    ]}
+                  />
+                </Field>
+                <Field label="Nº de notícias">
+                  <Num
+                    value={c.max_items ?? 10}
+                    min={1}
+                    max={30}
+                    step={1}
+                    onChange={(n) => setC({ max_items: Math.round(n) })}
+                  />
+                </Field>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <Field label="Texto">
+                  <Colour
+                    value={c.text_color}
+                    onChange={(text_color) => setC({ text_color })}
+                    fallback="#ffffff"
+                  />
+                </Field>
+                <Field label="Fundo">
+                  <Colour value={c.bg} onChange={(bg) => setC({ bg })} />
+                </Field>
+              </div>
+              <p className="text-[11px] text-muted-foreground">
+                As notícias atualizam a cada 10 minutos. Grave o layout antes de pré-visualizar um
+                feed novo.
+              </p>
+            </>
+          ) : null}
+
           {zone.kind === "webpage" ? (
             <>
               <Field
@@ -637,5 +698,106 @@ export function Inspector({ zone, readOnly, sources, playlists, onChange }: Prop
         </TabsContent>
       </Tabs>
     </fieldset>
+  );
+}
+
+type GeoHit = {
+  name: string;
+  admin1?: string;
+  country?: string;
+  latitude: number;
+  longitude: number;
+};
+
+function WeatherFields({ c, setC }: { c: ZoneConfig; setC: (p: ZoneConfig) => void }) {
+  const [q, setQ] = useState("");
+  const [hits, setHits] = useState<GeoHit[]>([]);
+  const [busy, setBusy] = useState(false);
+  const search = async () => {
+    if (q.trim().length < 2) return;
+    setBusy(true);
+    try {
+      const r = await fetch(
+        `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q.trim())}&count=6&language=pt`,
+      );
+      const j = (await r.json()) as { results?: GeoHit[] };
+      setHits(j.results ?? []);
+    } catch {
+      setHits([]);
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <>
+      <Field
+        label="Localidade"
+        hint={c.city ? `Atual: ${c.city} (${c.lat?.toFixed(2)}, ${c.lon?.toFixed(2)})` : undefined}
+      >
+        <div className="flex gap-2">
+          <Input
+            value={q}
+            placeholder={c.city || "Ex.: Montijo"}
+            onChange={(e) => setQ(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                void search();
+              }
+            }}
+          />
+          <Button type="button" variant="outline" onClick={() => void search()} disabled={busy}>
+            Procurar
+          </Button>
+        </div>
+        {hits.length ? (
+          <div className="mt-1 divide-y rounded-md border">
+            {hits.map((h) => (
+              <button
+                key={`${h.latitude},${h.longitude}`}
+                type="button"
+                className="block w-full px-2 py-1.5 text-left text-xs hover:bg-muted"
+                onClick={() => {
+                  setC({ city: h.name, lat: h.latitude, lon: h.longitude });
+                  setHits([]);
+                  setQ("");
+                }}
+              >
+                {h.name}
+                <span className="text-muted-foreground">
+                  {[h.admin1, h.country].filter(Boolean).join(", ")
+                    ? ` · ${[h.admin1, h.country].filter(Boolean).join(", ")}`
+                    : ""}
+                </span>
+              </button>
+            ))}
+          </div>
+        ) : null}
+      </Field>
+      <div className="grid grid-cols-2 gap-2">
+        <Field label="Previsão">
+          <Pick
+            value={String(c.forecast_days ?? 3) as "0" | "1" | "2" | "3"}
+            onChange={(v) => setC({ forecast_days: Number(v) })}
+            options={[
+              { value: "0", label: "Só agora" },
+              { value: "1", label: "+1 dia" },
+              { value: "2", label: "+2 dias" },
+              { value: "3", label: "+3 dias" },
+            ]}
+          />
+        </Field>
+        <Field label="Cor do texto">
+          <Colour
+            value={c.text_color}
+            onChange={(text_color) => setC({ text_color })}
+            fallback="#ffffff"
+          />
+        </Field>
+      </div>
+      <p className="text-[11px] text-muted-foreground">
+        Dados de Open-Meteo, atualizados a cada 30 minutos.
+      </p>
+    </>
   );
 }

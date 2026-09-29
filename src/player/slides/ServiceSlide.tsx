@@ -1,14 +1,9 @@
 import { QrImage } from "@/player/components/QrImage";
-import * as Icons from "lucide-react";
+import { findIcon } from "./icons";
 import type { SlideProps } from "./types";
 
 function Icon({ name, color }: { name?: string; color: string }) {
-  if (!name) return null;
-  const key = name
-    .split(/[-_\s]/)
-    .map((p) => p.charAt(0).toUpperCase() + p.slice(1))
-    .join("");
-  const Cmp = (Icons as unknown as Record<string, Icons.LucideIcon>)[key];
+  const Cmp = findIcon(name);
   if (!Cmp) return null;
   return <Cmp style={{ color }} className="h-[10cqh] w-[10cqh]" />;
 }

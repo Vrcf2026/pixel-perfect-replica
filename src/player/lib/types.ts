@@ -57,7 +57,19 @@ export type PlayerZone = {
 
 export type PlayerSource = SourceLike & { id: string; name?: string };
 
+export type Campaign = {
+  id: string;
+  title: string;
+  body: string | null;
+  style: "banner" | "fullscreen";
+  bg: string;
+  text_color: string;
+  starts_at: string;
+  ends_at: string;
+};
+
 export type PlayerConfig = {
+  campaigns?: Campaign[];
   error?: string;
   version: string;
   generated_at?: string;

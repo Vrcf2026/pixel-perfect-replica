@@ -2,11 +2,13 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Stage } from "./Stage";
 import { playerClient } from "./lib/client";
 import { recentErrors, reportPlayerError } from "./lib/errors";
+import { restorePlays, setPlayLogging, takePlays } from "./lib/plays";
 import type { PlayerConfig } from "./lib/types";
 
 const PING_MS = 20_000;
 const REFRESH_MS = 5 * 60_000;
 const PREVIEW_POLL_MS = 30_000;
+const PLAYS_FLUSH_MS = 5 * 60_000;
 const cacheKey = (token: string) => `montra:${token}`;
 
 type Status = "loading" | "ok" | "offline" | "notfound" | "suspended";
@@ -127,7 +129,10 @@ export function PlayerApp({ token, preview }: { token: string; preview: boolean 
           setStatus("notfound");
           return;
         }
-        if (res.command === "reload") return window.location.reload();
+        if (res.command === "reload") {
+          await flushPlays();
+          return window.location.reload();
+        }
         if (res.command === "clear_cache") {
           await clearCaches();
           return window.location.reload();
@@ -137,14 +142,39 @@ export function PlayerApp({ token, preview }: { token: string; preview: boolean 
         reportPlayerError(`Ping: ${e instanceof Error ? e.message : String(e)}`);
       }
     };
+    const flushPlays = async () => {
+      const list = takePlays();
+      if (!list.length) return;
+      try {
+        const { error } = await playerClient().rpc("player_log_plays", {
+          p_token: token,
+          p_entries: list,
+        });
+        if (error) throw error;
+      } catch {
+        restorePlays(list); // tenta outra vez no próximo envio
+      }
+    };
+    setPlayLogging(true);
+    const onHide = () => document.visibilityState === "hidden" && void flushPlays();
+    document.addEventListener("visibilitychange", onHide);
+    const f = setInterval(() => void flushPlays(), PLAYS_FLUSH_MS);
+
     void ping();
     const a = setInterval(() => void ping(), PING_MS);
     const b = setInterval(() => void fetchConfig(), REFRESH_MS);
-    const c = setTimeout(() => window.location.reload(), msUntil4am());
+    const c = setTimeout(
+      () => void flushPlays().finally(() => window.location.reload()),
+      msUntil4am(),
+    );
     return () => {
       clearInterval(a);
       clearInterval(b);
       clearTimeout(c);
+      clearInterval(f);
+      document.removeEventListener("visibilitychange", onHide);
+      setPlayLogging(false);
+      void flushPlays();
     };
   }, [token, preview, fetchConfig]);
 

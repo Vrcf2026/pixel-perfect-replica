@@ -1,5 +1,5 @@
 export type ZoneKind =
-  "main" | "playlist" | "ticker" | "clock" | "logo" | "text" | "qr" | "webpage";
+  "main" | "playlist" | "ticker" | "clock" | "logo" | "text" | "qr" | "webpage" | "weather" | "rss";
 export type Orientation = "landscape" | "portrait";
 
 /** layout_zones.style (medidas em px de um ecrã com 1920 de largura; escalam com o ecrã). */
@@ -48,4 +48,13 @@ export type ZoneConfig = {
   // webpage
   zoom?: number;
   refresh_s?: number;
+  // weather
+  city?: string;
+  lat?: number;
+  lon?: number;
+  forecast_days?: number;
+  // rss
+  max_items?: number;
+  mode?: "headline" | "ticker";
+  source_label?: string;
 };

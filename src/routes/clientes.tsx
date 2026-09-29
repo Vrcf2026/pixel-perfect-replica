@@ -20,6 +20,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { STATUS_META, lastSeen, screenStatus } from "@/features/screens/shared";
+import { PlatformSettingsCard } from "@/features/org/PlatformSettingsCard";
 
 export const Route = createFileRoute("/clientes")({
   head: () => ({
@@ -336,6 +337,8 @@ function ClientesPage() {
               })}
             </div>
           )}
+
+          <PlatformSettingsCard />
 
           <section className="rounded-lg border bg-card p-4">
             <div className="mb-3 flex flex-wrap items-center justify-between gap-2">

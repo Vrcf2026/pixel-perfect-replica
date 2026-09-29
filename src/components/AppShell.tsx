@@ -16,6 +16,8 @@ import {
   Users,
   Crown,
   PauseCircle,
+  Megaphone,
+  BarChart3,
 } from "lucide-react";
 import { useAuth } from "@/features/auth/AuthContext";
 import { useOrg } from "@/features/org/OrgContext";
@@ -36,6 +38,8 @@ const NAV = [
   { to: "/layouts", label: "Layouts", icon: LayoutTemplate },
   { to: "/playlists", label: "Playlists", icon: ListVideo },
   { to: "/fontes", label: "Fontes de vídeo", icon: Radio },
+  { to: "/avisos", label: "Avisos urgentes", icon: Megaphone },
+  { to: "/relatorios", label: "Relatórios", icon: BarChart3 },
   { to: "/biblioteca", label: "Biblioteca", icon: Images },
   { to: "/aparencia", label: "Aparência", icon: Palette },
   { to: "/utilizadores", label: "Utilizadores", icon: Users },

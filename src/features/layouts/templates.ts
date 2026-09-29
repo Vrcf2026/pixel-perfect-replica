@@ -7,6 +7,8 @@ import {
   Radio,
   Type,
   AlignJustify,
+  CloudSun,
+  Newspaper,
   type LucideIcon,
 } from "lucide-react";
 import type { Orientation, ZoneConfig, ZoneKind, ZoneStyle } from "./types";
@@ -20,6 +22,8 @@ export const ZONE_KINDS: ZoneKind[] = [
   "text",
   "qr",
   "webpage",
+  "weather",
+  "rss",
 ];
 
 export const ZONE_META: Record<ZoneKind, { label: string; icon: LucideIcon; color: string }> = {
@@ -31,6 +35,8 @@ export const ZONE_META: Record<ZoneKind, { label: string; icon: LucideIcon; colo
   text: { label: "Texto", icon: Type, color: "#DB2777" },
   qr: { label: "Código QR", icon: QrCode, color: "#475569" },
   webpage: { label: "Página web", icon: Globe, color: "#CA8A04" },
+  weather: { label: "Meteorologia", icon: CloudSun, color: "#0EA5E9" },
+  rss: { label: "Notícias (RSS)", icon: Newspaper, color: "#9333EA" },
 };
 
 export function defaultZoneConfig(kind: ZoneKind): ZoneConfig {
@@ -65,11 +71,16 @@ export function defaultZoneConfig(kind: ZoneKind): ZoneConfig {
       return { url: "https://", caption: "", fg: "#0F1E36", bg: "#FFFFFF" };
     case "webpage":
       return { url: "https://", zoom: 1, refresh_s: 0 };
+    case "weather":
+      return { city: "Montijo", lat: 38.707, lon: -8.974, forecast_days: 3, text_color: "#FFFFFF" };
+    case "rss":
+      return { url: "", max_items: 10, mode: "headline", text_color: "#FFFFFF", source_label: "" };
   }
 }
 
 export function defaultZoneStyle(kind: ZoneKind): ZoneStyle {
-  if (kind === "clock" || kind === "text") return { bg: "#0F1E36" };
+  if (kind === "clock" || kind === "text" || kind === "weather" || kind === "rss")
+    return { bg: "#0F1E36" };
   if (kind === "logo") return { bg: "#FFFFFF", padding: 16 };
   return {};
 }

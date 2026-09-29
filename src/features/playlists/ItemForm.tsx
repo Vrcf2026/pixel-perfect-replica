@@ -1,3 +1,4 @@
+import { SLIDE_ICONS, SLIDE_ICON_NAMES } from "@/player/slides/icons";
 import { MediaPicker } from "@/features/media/MediaPicker";
 import { PRODUCT_TEMPLATES, SERVICE_TEMPLATES, type ItemData, type ItemKind } from "./contract";
 import { Input } from "@/components/ui/input";
@@ -206,12 +207,31 @@ export function ItemForm({ kind, data, onChange, sources }: Props) {
               onChange={(e) => set({ bullets: e.target.value.split("\n").filter(Boolean) })}
             />
           </div>
-          <Text
-            label="Ícone"
-            value={data.icon}
-            onChange={(v) => set({ icon: v })}
-            placeholder="scissors, car, coffee…"
-          />
+          <div className="space-y-1.5">
+            <Label>Ícone</Label>
+            <Select
+              value={String(data.icon ?? "__none__")}
+              onValueChange={(v) => set({ icon: v === "__none__" ? "" : v })}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="max-h-72">
+                <SelectItem value="__none__">— Sem ícone —</SelectItem>
+                {SLIDE_ICON_NAMES.map((n) => {
+                  const I = SLIDE_ICONS[n]!.icon;
+                  return (
+                    <SelectItem key={n} value={n}>
+                      <span className="flex items-center gap-2">
+                        <I className="h-4 w-4" />
+                        {SLIDE_ICONS[n]!.label}
+                      </span>
+                    </SelectItem>
+                  );
+                })}
+              </SelectContent>
+            </Select>
+          </div>
           <Picker
             label="Imagem"
             kind="image"

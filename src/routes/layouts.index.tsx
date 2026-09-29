@@ -271,7 +271,7 @@ function NewLayoutDialog({
           radius: z.radius ?? 0,
           style: defaultZoneStyle(z.kind) as unknown as Json,
           config: defaultZoneConfig(z.kind) as unknown as Json,
-        })),
+        })) as never,
       );
       if (zErr) toast.error(zErr.message);
     }

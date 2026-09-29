@@ -11,11 +11,13 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AparenciaRouteImport } from './routes/aparencia'
+import { Route as AvisosRouteImport } from './routes/avisos'
 import { Route as BibliotecaRouteImport } from './routes/biblioteca'
 import { Route as ClientesRouteImport } from './routes/clientes'
 import { Route as DefinicoesRouteImport } from './routes/definicoes'
 import { Route as FontesRouteImport } from './routes/fontes'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as RelatoriosRouteImport } from './routes/relatorios'
 import { Route as UtilizadoresRouteImport } from './routes/utilizadores'
 import { Route as EcrasIndexRouteImport } from './routes/ecras.index'
 import { Route as EcrasIdRouteImport } from './routes/ecras.$id'
@@ -34,6 +36,11 @@ const IndexRoute = IndexRouteImport.update({
 const AparenciaRoute = AparenciaRouteImport.update({
   id: '/aparencia',
   path: '/aparencia',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AvisosRoute = AvisosRouteImport.update({
+  id: '/avisos',
+  path: '/avisos',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BibliotecaRoute = BibliotecaRouteImport.update({
@@ -59,6 +66,11 @@ const FontesRoute = FontesRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RelatoriosRoute = RelatoriosRouteImport.update({
+  id: '/relatorios',
+  path: '/relatorios',
   getParentRoute: () => rootRouteImport,
 } as any)
 const UtilizadoresRoute = UtilizadoresRouteImport.update({
@@ -110,11 +122,13 @@ const PreviewLayoutIdRoute = PreviewLayoutIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/aparencia': typeof AparenciaRoute
+  '/avisos': typeof AvisosRoute
   '/biblioteca': typeof BibliotecaRoute
   '/clientes': typeof ClientesRoute
   '/definicoes': typeof DefinicoesRoute
   '/fontes': typeof FontesRoute
   '/login': typeof LoginRoute
+  '/relatorios': typeof RelatoriosRoute
   '/utilizadores': typeof UtilizadoresRoute
   '/ecras/$id': typeof EcrasIdRoute
   '/layouts/$id': typeof LayoutsIdRoute
@@ -128,11 +142,13 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/aparencia': typeof AparenciaRoute
+  '/avisos': typeof AvisosRoute
   '/biblioteca': typeof BibliotecaRoute
   '/clientes': typeof ClientesRoute
   '/definicoes': typeof DefinicoesRoute
   '/fontes': typeof FontesRoute
   '/login': typeof LoginRoute
+  '/relatorios': typeof RelatoriosRoute
   '/utilizadores': typeof UtilizadoresRoute
   '/ecras/$id': typeof EcrasIdRoute
   '/layouts/$id': typeof LayoutsIdRoute
@@ -147,11 +163,13 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/aparencia': typeof AparenciaRoute
+  '/avisos': typeof AvisosRoute
   '/biblioteca': typeof BibliotecaRoute
   '/clientes': typeof ClientesRoute
   '/definicoes': typeof DefinicoesRoute
   '/fontes': typeof FontesRoute
   '/login': typeof LoginRoute
+  '/relatorios': typeof RelatoriosRoute
   '/utilizadores': typeof UtilizadoresRoute
   '/ecras/$id': typeof EcrasIdRoute
   '/layouts/$id': typeof LayoutsIdRoute
@@ -167,11 +185,13 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/aparencia'
+    | '/avisos'
     | '/biblioteca'
     | '/clientes'
     | '/definicoes'
     | '/fontes'
     | '/login'
+    | '/relatorios'
     | '/utilizadores'
     | '/ecras/$id'
     | '/layouts/$id'
@@ -185,11 +205,13 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/aparencia'
+    | '/avisos'
     | '/biblioteca'
     | '/clientes'
     | '/definicoes'
     | '/fontes'
     | '/login'
+    | '/relatorios'
     | '/utilizadores'
     | '/ecras/$id'
     | '/layouts/$id'
@@ -203,11 +225,13 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/aparencia'
+    | '/avisos'
     | '/biblioteca'
     | '/clientes'
     | '/definicoes'
     | '/fontes'
     | '/login'
+    | '/relatorios'
     | '/utilizadores'
     | '/ecras/$id'
     | '/layouts/$id'
@@ -222,11 +246,13 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AparenciaRoute: typeof AparenciaRoute
+  AvisosRoute: typeof AvisosRoute
   BibliotecaRoute: typeof BibliotecaRoute
   ClientesRoute: typeof ClientesRoute
   DefinicoesRoute: typeof DefinicoesRoute
   FontesRoute: typeof FontesRoute
   LoginRoute: typeof LoginRoute
+  RelatoriosRoute: typeof RelatoriosRoute
   UtilizadoresRoute: typeof UtilizadoresRoute
   EcrasIdRoute: typeof EcrasIdRoute
   LayoutsIdRoute: typeof LayoutsIdRoute
@@ -252,6 +278,13 @@ declare module '@tanstack/react-router' {
       path: '/aparencia'
       fullPath: '/aparencia'
       preLoaderRoute: typeof AparenciaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/avisos': {
+      id: '/avisos'
+      path: '/avisos'
+      fullPath: '/avisos'
+      preLoaderRoute: typeof AvisosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/biblioteca': {
@@ -287,6 +320,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/relatorios': {
+      id: '/relatorios'
+      path: '/relatorios'
+      fullPath: '/relatorios'
+      preLoaderRoute: typeof RelatoriosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/utilizadores': {
@@ -358,11 +398,13 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AparenciaRoute: AparenciaRoute,
+  AvisosRoute: AvisosRoute,
   BibliotecaRoute: BibliotecaRoute,
   ClientesRoute: ClientesRoute,
   DefinicoesRoute: DefinicoesRoute,
   FontesRoute: FontesRoute,
   LoginRoute: LoginRoute,
+  RelatoriosRoute: RelatoriosRoute,
   UtilizadoresRoute: UtilizadoresRoute,
   EcrasIdRoute: EcrasIdRoute,
   LayoutsIdRoute: LayoutsIdRoute,

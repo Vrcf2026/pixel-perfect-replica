@@ -5,10 +5,13 @@ import { SourceView } from "@/player/components/SourceView";
 import { isItemActive } from "./lib/time";
 import { expandCatalog } from "./lib/catalog";
 import { reportPlayerError } from "./lib/errors";
+import { logPlay } from "./lib/plays";
 import type { PlayerPlaylist, PlayerSource, Theme } from "./lib/types";
 
 type Entry = {
   key: string;
+  item_id: string;
+  label: string;
   kind: string;
   data: Record<string, unknown>;
   /** null = até o vídeo acabar */
@@ -36,6 +39,22 @@ function preload(entry: Entry | undefined) {
   }
 }
 
+function labelOf(it: { kind: string; data: Record<string, unknown> }) {
+  const d = it.data ?? {};
+  const v = d["name"] ?? d["title"] ?? d["caption"] ?? d["url"] ?? d["video_url"] ?? d["image_url"];
+  const names: Record<string, string> = {
+    image: "Imagem",
+    video: "Vídeo",
+    stream: "Canal",
+    webpage: "Página",
+    qr: "QR",
+  };
+  return String(v ?? names[it.kind] ?? it.kind)
+    .split("/")
+    .pop()!
+    .slice(0, 120);
+}
+
 async function buildQueue(playlist: PlayerPlaylist, tz: string): Promise<Entry[]> {
   const def = Math.max(1, playlist.default_duration_s || 8) * 1000;
   let items = playlist.items.filter((it) => isItemActive(it, tz));
@@ -48,7 +67,14 @@ async function buildQueue(playlist: PlayerPlaylist, tz: string): Promise<Entry[]
         const rows = await expandCatalog(it.data);
         const per = Math.max(2, Number(it.data["per_item_s"]) || 8) * 1000;
         rows.forEach((row, i) =>
-          out.push({ key: `${it.id}:${i}`, kind: "product", data: row, durationMs: per }),
+          out.push({
+            key: `${it.id}:${String(row["name"] ?? i)}`.slice(0, 120),
+            item_id: it.id,
+            label: String(row["name"] ?? "Produto do catálogo"),
+            kind: "product",
+            data: row,
+            durationMs: per,
+          }),
         );
       } catch (e) {
         reportPlayerError(`Catálogo: ${e instanceof Error ? e.message : String(e)}`);
@@ -56,10 +82,24 @@ async function buildQueue(playlist: PlayerPlaylist, tz: string): Promise<Entry[]
       continue;
     }
     if (it.kind === "video") {
-      out.push({ key: it.id, kind: "video", data: it.data, durationMs: dur });
+      out.push({
+        key: it.id,
+        item_id: it.id,
+        label: labelOf(it),
+        kind: "video",
+        data: it.data,
+        durationMs: dur,
+      });
       continue;
     }
-    out.push({ key: it.id, kind: it.kind, data: it.data, durationMs: dur ?? def });
+    out.push({
+      key: it.id,
+      item_id: it.id,
+      label: labelOf(it),
+      kind: it.kind,
+      data: it.data,
+      durationMs: dur ?? def,
+    });
   }
   return out;
 }
@@ -98,10 +138,12 @@ export function PlaylistRunner({
   const alive = useRef(true);
   const currentRef = useRef<Entry | null>(null);
   currentRef.current = current;
+  const shownAt = useRef<number>(0);
 
   // Muda só quando o conteúdo da playlist muda de facto.
   const signature = useMemo(() => JSON.stringify(playlist), [playlist]);
   const transition = transitionOverride || playlist.transition || "fade";
+  const playlistId = playlist.id;
   const sourceList = useMemo(() => Object.values(sources), [sources]);
 
   const clear = () => {
@@ -111,6 +153,18 @@ export function PlaylistRunner({
 
   const advance = useCallback(async () => {
     clear();
+    const was = currentRef.current;
+    if (was && shownAt.current) {
+      logPlay({
+        key: was.key,
+        item_id: was.item_id,
+        playlist_id: playlistId,
+        label: was.label,
+        kind: was.kind,
+        seconds: (Date.now() - shownAt.current) / 1000,
+      });
+    }
+    shownAt.current = Date.now();
     if (pos.current >= queue.current.length) {
       queue.current = await buildQueue(JSON.parse(signature) as PlayerPlaylist, tz);
       pos.current = 0;
@@ -135,7 +189,7 @@ export function PlaylistRunner({
     }
     const ms = entry.durationMs ?? MAX_VIDEO_MS;
     timer.current = setTimeout(() => void advance(), ms);
-  }, [signature, tz]);
+  }, [signature, tz, playlistId]);
 
   useEffect(() => {
     alive.current = true;
