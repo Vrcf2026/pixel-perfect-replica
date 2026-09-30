@@ -16,6 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ZONE_KINDS, ZONE_META, defaultZoneConfig, round1 } from "./templates";
+import { FONTS } from "@/player/lib/theme";
 import type { Zone, ZoneConfig, ZoneKind, ZoneStyle } from "./types";
 
 type Props = {
@@ -129,6 +130,84 @@ function Pick<T extends string>({
   );
 }
 
+type Quick = {
+  id: string;
+  label: string;
+  style: ZoneStyle;
+  text: string;
+  swatch: React.CSSProperties;
+};
+
+/** Estilos rápidos: mudam o fundo e, onde existe, a cor do texto da zona. */
+const QUICK_STYLES: Quick[] = [
+  {
+    id: "none",
+    label: "Sem fundo",
+    style: { bg_mode: "none", text_shadow: true, shadow: false, border_width: 0 },
+    text: "#FFFFFF",
+    swatch: { background: "repeating-conic-gradient(#cbd5e1 0 25%, #94a3b8 0 50%) 0 0/10px 10px" },
+  },
+  {
+    id: "dark",
+    label: "Escuro",
+    style: { bg_mode: "solid", bg: "#0F1E36", text_shadow: false, border_width: 0 },
+    text: "#FFFFFF",
+    swatch: { background: "#0F1E36" },
+  },
+  {
+    id: "light",
+    label: "Claro",
+    style: { bg_mode: "solid", bg: "#F3F5F8", text_shadow: false, border_width: 0 },
+    text: "#0F1E36",
+    swatch: { background: "#F3F5F8", border: "1px solid #e2e8f0" },
+  },
+  {
+    id: "glass",
+    label: "Vidro",
+    style: {
+      bg_mode: "glass",
+      bg: "#0F1E36",
+      glass_alpha: 0.4,
+      blur: 16,
+      text_shadow: false,
+      border_width: 1,
+      border_color: "#FFFFFF40",
+    },
+    text: "#FFFFFF",
+    swatch: {
+      background: "linear-gradient(135deg, rgba(15,30,54,.55), rgba(15,30,54,.3)), #64748b",
+    },
+  },
+  {
+    id: "orange",
+    label: "Laranja",
+    style: {
+      bg_mode: "gradient",
+      bg: "#F28C28",
+      bg2: "#E0561B",
+      bg_angle: 135,
+      text_shadow: false,
+      border_width: 0,
+    },
+    text: "#FFFFFF",
+    swatch: { background: "linear-gradient(135deg, #F28C28, #E0561B)" },
+  },
+  {
+    id: "night",
+    label: "Noite",
+    style: {
+      bg_mode: "gradient",
+      bg: "#0F1E36",
+      bg2: "#2563EB",
+      bg_angle: 135,
+      text_shadow: false,
+      border_width: 0,
+    },
+    text: "#FFFFFF",
+    swatch: { background: "linear-gradient(135deg, #0F1E36, #2563EB)" },
+  },
+];
+
 const ALIGN = [
   { value: "left" as const, label: "Esquerda" },
   { value: "center" as const, label: "Centro" },
@@ -155,6 +234,13 @@ export function Inspector({ zone, readOnly, sources, playlists, onChange }: Prop
       source_id: kind === "main" ? zone.source_id : null,
       playlist_id: kind === "playlist" ? zone.playlist_id : null,
     });
+  };
+
+  const applyQuick = (q: Quick) => {
+    const cfg: ZoneConfig = { ...c };
+    if (["clock", "text", "weather", "rss", "ticker"].includes(zone.kind)) cfg.text_color = q.text;
+    if (zone.kind === "ticker" || zone.kind === "rss") cfg.bg = "";
+    onChange({ style: { ...st, ...q.style }, config: cfg });
   };
 
   const messages = c.messages ?? [];
@@ -210,9 +296,121 @@ export function Inspector({ zone, readOnly, sources, playlists, onChange }: Prop
         </TabsContent>
 
         <TabsContent value="estilo" className="space-y-3 pt-2">
-          <Field label="Fundo">
-            <Colour value={st.bg} onChange={(bg) => setS({ bg })} />
+          <Field label="Estilos rápidos">
+            <div className="grid grid-cols-3 gap-1.5">
+              {QUICK_STYLES.map((q) => (
+                <button
+                  key={q.id}
+                  type="button"
+                  onClick={() => applyQuick(q)}
+                  className="flex flex-col items-center gap-1 rounded-md border p-1.5 text-[11px] hover:border-[#F28C28]"
+                >
+                  <span
+                    className="flex h-7 w-full items-center justify-center rounded text-[11px] font-bold"
+                    style={{
+                      ...q.swatch,
+                      color: q.text,
+                      textShadow: q.style.text_shadow ? "0 1px 3px rgba(0,0,0,.8)" : undefined,
+                    }}
+                  >
+                    12:30
+                  </span>
+                  {q.label}
+                </button>
+              ))}
+            </div>
           </Field>
+
+          <Field label="Fundo">
+            <Pick
+              value={st.bg_mode ?? (st.bg ? "solid" : "none")}
+              onChange={(bg_mode) => setS({ bg_mode })}
+              options={[
+                { value: "none", label: "Sem fundo (transparente)" },
+                { value: "solid", label: "Cor" },
+                { value: "gradient", label: "Degradé" },
+                { value: "glass", label: "Vidro fosco" },
+              ]}
+            />
+          </Field>
+          {(st.bg_mode ?? (st.bg ? "solid" : "none")) !== "none" ? (
+            <div className="grid grid-cols-2 gap-2">
+              <Field label={st.bg_mode === "gradient" ? "Cor 1" : "Cor"}>
+                <Colour value={st.bg} onChange={(bg) => setS({ bg })} />
+              </Field>
+              {st.bg_mode === "gradient" ? (
+                <Field label="Cor 2">
+                  <Colour value={st.bg2} onChange={(bg2) => setS({ bg2 })} fallback="#2563eb" />
+                </Field>
+              ) : null}
+              {st.bg_mode === "glass" ? (
+                <Field
+                  label={`Transparência (${Math.round((1 - (st.glass_alpha ?? 0.45)) * 100)}%)`}
+                >
+                  <Slider
+                    value={[Math.round((st.glass_alpha ?? 0.45) * 100)]}
+                    min={10}
+                    max={90}
+                    step={5}
+                    onValueChange={(v) => setS({ glass_alpha: (v[0] ?? 45) / 100 })}
+                  />
+                </Field>
+              ) : null}
+            </div>
+          ) : null}
+          {st.bg_mode === "gradient" ? (
+            <Field label={`Direção (${st.bg_angle ?? 135}°)`}>
+              <Slider
+                value={[st.bg_angle ?? 135]}
+                min={0}
+                max={360}
+                step={15}
+                onValueChange={(v) => setS({ bg_angle: v[0] ?? 135 })}
+              />
+            </Field>
+          ) : null}
+          {st.bg_mode === "glass" ? (
+            <Field label={`Desfoque (${st.blur ?? 16}px)`}>
+              <Slider
+                value={[st.blur ?? 16]}
+                min={0}
+                max={40}
+                step={2}
+                onValueChange={(v) => setS({ blur: v[0] ?? 16 })}
+              />
+            </Field>
+          ) : null}
+
+          <Field label="Tipo de letra">
+            <Select
+              value={st.font || NONE}
+              onValueChange={(v) => setS({ font: v === NONE ? "" : v })}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="max-h-72">
+                <SelectItem value={NONE}>O do tema (Aparência)</SelectItem>
+                {FONTS.map((f) => (
+                  <SelectItem key={f} value={f}>
+                    <span style={{ fontFamily: `"${f}", sans-serif` }}>{f}</span>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </Field>
+          <div className="flex items-center justify-between">
+            <Label className="text-xs">Sombra no texto (ler sobre vídeo)</Label>
+            <Switch
+              checked={!!st.text_shadow}
+              onCheckedChange={(text_shadow) => setS({ text_shadow })}
+            />
+          </div>
+          <div className="flex items-center justify-between">
+            <Label className="text-xs">Sombra na caixa</Label>
+            <Switch checked={!!st.shadow} onCheckedChange={(shadow) => setS({ shadow })} />
+          </div>
+
           <div className="grid grid-cols-2 gap-2">
             <Field label="Borda (px)">
               <Num
@@ -238,10 +436,6 @@ export function Inspector({ zone, readOnly, sources, playlists, onChange }: Prop
               <Colour value={st.border_color} onChange={(border_color) => setS({ border_color })} />
             </Field>
           ) : null}
-          <div className="flex items-center justify-between">
-            <Label className="text-xs">Sombra</Label>
-            <Switch checked={!!st.shadow} onCheckedChange={(shadow) => setS({ shadow })} />
-          </div>
           <Field label={`Opacidade (${Math.round((st.opacity ?? 1) * 100)}%)`}>
             <Slider
               value={[Math.round((st.opacity ?? 1) * 100)]}
@@ -252,7 +446,8 @@ export function Inspector({ zone, readOnly, sources, playlists, onChange }: Prop
             />
           </Field>
           <p className="text-[11px] text-muted-foreground">
-            As medidas em px são de um ecrã Full HD e escalam com o ecrã.
+            As medidas em px são de um ecrã Full HD e escalam com o ecrã. Ligue "Ver conteúdo" para
+            ver o resultado sobre o vídeo.
           </p>
         </TabsContent>
 

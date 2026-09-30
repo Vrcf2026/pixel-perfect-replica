@@ -30,6 +30,9 @@ export const FONTS = [
   "Manrope",
   "Poppins",
   "Space Grotesk",
+  "Orbitron",
+  "Rajdhani",
+  "Playfair Display",
 ];
 
 export function mergeTheme(t?: Theme | null): Required<Theme> {
@@ -51,6 +54,19 @@ export function themeVars(t: Required<Theme>): CSSProperties {
     ["--font-body" as string]: `"${t.font_body}", "Barlow", system-ui, sans-serif`,
     fontFamily: "var(--font-body)",
   } as CSSProperties;
+}
+
+/** Carrega uma fonte do Google Fonts (uma vez). */
+export function ensureFont(fam?: string | null) {
+  if (typeof document === "undefined" || !fam || fam === "Barlow" || fam === "Barlow Condensed")
+    return;
+  const id = `font-${fam.replace(/\s+/g, "-").toLowerCase()}`;
+  if (document.getElementById(id)) return;
+  const link = document.createElement("link");
+  link.id = id;
+  link.rel = "stylesheet";
+  link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(fam).replace(/%20/g, "+")}:wght@400;500;600;700&display=swap`;
+  document.head.appendChild(link);
 }
 
 /** Carrega as fontes do tema a partir do Google Fonts (uma vez por família). */

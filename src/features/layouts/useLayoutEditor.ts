@@ -236,7 +236,11 @@ export function useLayoutEditor(layoutId: string, orgId: string | undefined) {
         .select()
         .single();
       if (error) {
-        toast.error(error.message);
+        toast.error(
+          error.message.includes("zone_kind")
+            ? "Este tipo de zona ainda não existe na base de dados: aplique o docs/sql/04-alertas-exibicoes-campanhas.sql."
+            : error.message,
+        );
         return null;
       }
       const zone = toZone(data as unknown as Record<string, unknown>);

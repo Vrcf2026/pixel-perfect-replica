@@ -1,6 +1,7 @@
 import { useRef, type PointerEvent as ReactPointerEvent } from "react";
 import { Lock } from "lucide-react";
 import { zoneBoxStyle, zoneInnerStyle } from "@/player/zones/style";
+import { ensureFont } from "@/player/lib/theme";
 import { ZONE_META } from "./templates";
 import { ZonePreview, type PreviewContext } from "./ZonePreview";
 import type { Orientation, Zone } from "./types";
@@ -103,6 +104,7 @@ export function Canvas({
     window.addEventListener("pointerup", onUp);
   };
 
+  for (const z of zones) ensureFont(z.style?.font);
   const visible = [...zones]
     .filter((z) => !hidden.has(z.id))
     .sort((a, b) => a.z - b.z || a.position - b.position);

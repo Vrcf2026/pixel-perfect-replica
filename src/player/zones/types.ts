@@ -4,7 +4,17 @@ export type Orientation = "landscape" | "portrait";
 
 /** layout_zones.style (medidas em px de um ecrã com 1920 de largura; escalam com o ecrã). */
 export type ZoneStyle = {
+  /** none = transparente; solid = cor; gradient = degradé; glass = vidro fosco */
+  bg_mode?: "none" | "solid" | "gradient" | "glass";
   bg?: string;
+  bg2?: string;
+  bg_angle?: number;
+  /** vidro: desfoque (px) e transparência (0–1) */
+  blur?: number;
+  glass_alpha?: number;
+  text_shadow?: boolean;
+  /** tipo de letra só desta zona (vazio = o do tema) */
+  font?: string;
   border_color?: string;
   border_width?: number;
   shadow?: boolean;

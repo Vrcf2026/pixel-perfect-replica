@@ -5,6 +5,7 @@ import { LogoZone, QrZone, TextZone, WebpageZone } from "@/player/zones/SimpleZo
 import { WeatherZone } from "@/player/zones/WeatherZone";
 import { RssZone } from "@/player/zones/RssZone";
 import { zoneBoxStyle, zoneInnerStyle } from "@/player/zones/style";
+import { ensureFont } from "./lib/theme";
 import type { Orientation } from "@/player/zones/types";
 import { PlaylistRunner } from "./PlaylistRunner";
 import { ZoneErrorBoundary } from "./ZoneErrorBoundary";
@@ -84,6 +85,7 @@ export function ZoneView({
   theme: Required<Theme>;
   orientation: Orientation;
 }) {
+  ensureFont(zone.style?.font);
   const box = zoneBoxStyle(
     { ...zone, x: Number(zone.x), y: Number(zone.y), w: Number(zone.w), h: Number(zone.h) },
     orientation,

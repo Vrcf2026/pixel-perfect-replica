@@ -25,7 +25,17 @@ export function zoneBoxStyle(
     zIndex: zone.z,
     borderRadius: px(zone.radius, orientation),
     overflow: "hidden",
-    background: s.bg || undefined,
+    ...zoneBackground(s, orientation),
+    ...(s.text_shadow
+      ? { textShadow: "0 0.15cqw 0.6cqw rgba(0,0,0,.75), 0 0 1.2cqw rgba(0,0,0,.35)" }
+      : {}),
+    ...(s.font
+      ? ({
+          fontFamily: `"${s.font}", system-ui, sans-serif`,
+          ["--font-display" as string]: `"${s.font}", system-ui, sans-serif`,
+          ["--font-body" as string]: `"${s.font}", system-ui, sans-serif`,
+        } as CSSProperties)
+      : {}),
     border: s.border_width
       ? `${px(s.border_width, orientation)} solid ${s.border_color || "#000"}`
       : undefined,
@@ -34,6 +44,37 @@ export function zoneBoxStyle(
     opacity: s.opacity ?? 1,
     boxSizing: "border-box",
   };
+}
+
+/** "#RRGGBB" → "rgba(r,g,b,a)"; devolve a cor tal como está se não for hexadecimal. */
+export function withAlpha(color: string, alpha: number) {
+  const m = /^#?([0-9a-f]{6})$/i.exec(color.trim());
+  if (!m) return color;
+  const n = parseInt(m[1] as string, 16);
+  return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${alpha})`;
+}
+
+export function zoneBackground(s: ZoneStyle, orientation: Orientation): CSSProperties {
+  const mode = s.bg_mode ?? (s.bg ? "solid" : "none");
+  const c1 = s.bg || "#0F1E36";
+  switch (mode) {
+    case "none":
+      return { background: "transparent" };
+    case "gradient":
+      return {
+        background: `linear-gradient(${s.bg_angle ?? 135}deg, ${c1}, ${s.bg2 || "#2563EB"})`,
+      };
+    case "glass": {
+      const blur = px(s.blur ?? 16, orientation);
+      return {
+        background: withAlpha(c1, s.glass_alpha ?? 0.45),
+        backdropFilter: `blur(${blur}) saturate(1.3)`,
+        WebkitBackdropFilter: `blur(${blur}) saturate(1.3)`,
+      };
+    }
+    default:
+      return { background: c1 };
+  }
 }
 
 /** Estilo do elemento interior de cada zona: torna-a um contentor para medidas em cqh/cqw. */
