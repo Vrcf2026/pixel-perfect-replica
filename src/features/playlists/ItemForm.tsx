@@ -1,5 +1,6 @@
 import { SLIDE_ICONS, SLIDE_ICON_NAMES } from "@/player/slides/icons";
 import { MediaPicker } from "@/features/media/MediaPicker";
+import { ServiceListEditor } from "./ServiceListEditor";
 import { PRODUCT_TEMPLATES, SERVICE_TEMPLATES, type ItemData, type ItemKind } from "./contract";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -227,6 +228,48 @@ export function ItemForm({ kind, data, onChange, sources }: Props) {
       );
 
     case "service":
+      if (data.template === "list") {
+        return (
+          <div className="space-y-4">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Text
+                label="Título"
+                value={data.title}
+                onChange={(v) => set({ title: v })}
+                placeholder="Os nossos serviços"
+              />
+              <Text
+                label="Subtítulo"
+                value={data.subtitle}
+                onChange={(v) => set({ subtitle: v })}
+              />
+            </div>
+            <ServiceListEditor data={data} set={set} />
+            <Text
+              label="Rodapé da lista"
+              value={data.footer}
+              onChange={(v) => set({ footer: v })}
+              placeholder="Orçamentos gratuitos · Pergunte ao balcão"
+            />
+            <div className="space-y-1.5">
+              <Label>Modelo</Label>
+              <Select value="list" onValueChange={(v) => set({ template: v })}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {SERVICE_TEMPLATES.map((t) => (
+                    <SelectItem key={t.value} value={t.value}>
+                      {t.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <Style data={data} set={set} />
+          </div>
+        );
+      }
       return (
         <div className="space-y-4">
           <Text label="Título *" value={data.title} onChange={(v) => set({ title: v })} />

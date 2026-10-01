@@ -1,5 +1,6 @@
 import { QrImage } from "@/player/components/QrImage";
 import { findIcon } from "./icons";
+import { ServiceListSlide } from "./ServiceListSlide";
 import type { SlideProps } from "./types";
 
 function Icon({ name, color }: { name?: string; color: string }) {
@@ -9,6 +10,7 @@ function Icon({ name, color }: { name?: string; color: string }) {
 }
 
 export function ServiceSlide({ data }: SlideProps) {
+  if ((data.template as string) === "list") return <ServiceListSlide data={data} />;
   const bg = (data.bg as string) || "var(--m-primary, #0F1E36)";
   const text = (data.text_color as string) || "var(--m-text, #FFFFFF)";
   const accent = (data.accent as string) || "var(--m-accent, #F28C28)";

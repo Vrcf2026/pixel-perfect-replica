@@ -12,6 +12,59 @@ export type Preset = {
 /** Modelos prontos: criam um item já preenchido que depois só se ajusta. */
 export const PRESETS: Preset[] = [
   {
+    id: "lista_servicos",
+    label: "Lista de serviços",
+    hint: "Quadro com todos os serviços e preços",
+    kind: "service",
+    duration_s: 16,
+    data: {
+      template: "list",
+      title: "Os nossos serviços",
+      subtitle: "Pergunte ao balcão",
+      footer: "Orçamentos gratuitos",
+      highlight: true,
+      page_s: 8,
+      list: [
+        {
+          icon: "wrench",
+          title: "Reparação de computadores",
+          note: "Portáteis e fixos, diagnóstico rápido",
+          price: "",
+        },
+        {
+          icon: "printer",
+          title: "Fotocópias e impressões",
+          note: "A preto e a cores, A4 e A3",
+          price: "",
+        },
+        {
+          icon: "hard-drive",
+          title: "Recuperação de dados",
+          note: "Discos, pens e cartões",
+          price: "",
+        },
+        {
+          icon: "laptop",
+          title: "Formatação e instalação",
+          note: "Windows, programas e antivírus",
+          price: "",
+        },
+        {
+          icon: "wifi",
+          title: "Redes e Wi-Fi",
+          note: "Instalação e melhoria de cobertura",
+          price: "",
+        },
+        {
+          icon: "camera",
+          title: "Videovigilância e alarmes",
+          note: "Instalação certificada",
+          price: "",
+        },
+      ],
+    },
+  },
+  {
     id: "promo",
     label: "Promoção da semana",
     hint: "Produto com preço antigo riscado",

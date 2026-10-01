@@ -49,11 +49,17 @@ export const SERVICE_TEMPLATES = [
   { value: "big_title", label: "Título grande" },
   { value: "image_left", label: "Imagem à esquerda" },
   { value: "image_background", label: "Imagem de fundo" },
+  { value: "list", label: "Lista de serviços" },
 ] as const;
 
 // Campos possíveis de playlist_items.data (todos opcionais; variam por tipo).
 export type ItemData = {
   accent?: unknown;
+  list?: unknown;
+  footer?: unknown;
+  columns?: unknown;
+  highlight?: unknown;
+  page_s?: unknown;
   brand?: unknown;
   cta?: unknown;
   features?: unknown;
