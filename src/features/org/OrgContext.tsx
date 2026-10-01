@@ -1,4 +1,12 @@
-import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
+import {
+  useRef,
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+  type ReactNode,
+} from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { db } from "@/lib/untypedDb";
 import { useAuth } from "@/features/auth/AuthContext";
@@ -45,19 +53,24 @@ export function OrgProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [isSuper, setIsSuper] = useState(false);
 
+  const userId = user?.id ?? null;
+  const loadedFor = useRef<string | null>(null);
+
   const load = useCallback(async () => {
-    if (!user) {
+    if (!userId) {
       setIsSuper(false);
       setMemberships([]);
       setOrgId(null);
       setLoading(false);
       return;
     }
-    setLoading(true);
+    // Só mostra "a carregar" na primeira vez; recargas depois são silenciosas
+    // (evita que a página inteira pisque quando a sessão é renovada).
+    if (loadedFor.current !== userId) setLoading(true);
     const { data, error } = await supabase
       .from("org_members")
       .select("org_id, role, organizations(name)")
-      .eq("user_id", user.id);
+      .eq("user_id", userId);
 
     if (error) {
       console.error(error);
@@ -104,9 +117,10 @@ export function OrgProvider({ children }: { children: ReactNode }) {
 
     const stored = typeof window !== "undefined" ? localStorage.getItem(STORAGE_KEY) : null;
     const next = list.find((m) => m.org_id === stored)?.org_id ?? list[0]?.org_id ?? null;
-    setOrgId(next);
+    setOrgId((cur) => (cur && list.some((m) => m.org_id === cur) ? cur : next));
+    loadedFor.current = userId;
     setLoading(false);
-  }, [user]);
+  }, [userId]);
 
   useEffect(() => {
     if (authLoading) return;

@@ -1,5 +1,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
+  useRouterState,
   Outlet,
   Link,
   createRootRouteWithContext,
@@ -126,6 +127,18 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+
+  // O player dos ecrãs não usa login: não arranca a sessão (evita eventos de sessão
+  // que faziam piscar o painel quando o player está aberto num iframe).
+  if (pathname.startsWith("/player/")) {
+    return (
+      <QueryClientProvider client={queryClient}>
+        {/* Required: nested routes render here. */}
+        <Outlet />
+      </QueryClientProvider>
+    );
+  }
 
   return (
     <QueryClientProvider client={queryClient}>

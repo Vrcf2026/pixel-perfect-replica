@@ -27,3 +27,19 @@ export function formatPrice(
   if (n === null || !Number.isFinite(n)) return String(value);
   return new Intl.NumberFormat(locale, { style: "currency", currency }).format(n * multiplier);
 }
+
+/** Lê um preço (número ou texto como "1.234,50") e devolve o número, ou null. */
+export function parsePrice(value: unknown): number | null {
+  if (typeof value === "number") return Number.isFinite(value) ? value : null;
+  const s = String(value ?? "")
+    .replace(/[€$£\s]/g, "")
+    .trim();
+  if (!/^-?[\d.]*[,.]?\d+$/.test(s)) return null;
+  const norm = /^\d{1,3}(\.\d{3})+$/.test(s)
+    ? s.replace(/\./g, "")
+    : s.includes(",")
+      ? s.replace(/\./g, "").replace(",", ".")
+      : s;
+  const n = Number(norm);
+  return Number.isFinite(n) ? n : null;
+}

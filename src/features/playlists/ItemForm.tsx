@@ -135,7 +135,14 @@ export function ItemForm({ kind, data, onChange, sources }: Props) {
               onChange={(v) => set({ price_suffix: v })}
               placeholder="/kg"
             />
+            <Text label="Marca" value={data.brand} onChange={(v) => set({ brand: v })} />
             <Text label="Categoria" value={data.category} onChange={(v) => set({ category: v })} />
+            <Text
+              label="Chamada à ação"
+              value={data.cta}
+              onChange={(v) => set({ cta: v })}
+              placeholder="Peça já na loja"
+            />
             <Text
               label="Selo"
               value={data.badge}
@@ -155,12 +162,36 @@ export function ItemForm({ kind, data, onChange, sources }: Props) {
               onChange={(e) => set({ description: e.target.value })}
             />
           </div>
+          <div className="space-y-1.5">
+            <Label>Pontos fortes (um por linha, até 3)</Label>
+            <Textarea
+              rows={3}
+              value={(Array.isArray(data.features) ? (data.features as string[]) : []).join("\n")}
+              onChange={(e) => set({ features: e.target.value.split("\n").slice(0, 3) })}
+              placeholder={"Verificação por foto\nSem fios\nApp no telemóvel"}
+            />
+          </div>
           <Picker
             label="Imagem"
             kind="image"
             value={data.image_url}
             onChange={(v) => set({ image_url: v })}
           />
+          <div className="space-y-1.5">
+            <Label>Como mostrar a foto</Label>
+            <Select
+              value={String(data.photo_fit ?? "contain")}
+              onValueChange={(v) => set({ photo_fit: v })}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="contain">Produto inteiro (fotos de catálogo)</SelectItem>
+                <SelectItem value="cover">Preencher (fotos de ambiente)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
           <div className="space-y-1.5">
             <Label>Modelo</Label>
             <Select

@@ -54,6 +54,11 @@ export const SERVICE_TEMPLATES = [
 // Campos possíveis de playlist_items.data (todos opcionais; variam por tipo).
 export type ItemData = {
   accent?: unknown;
+  brand?: unknown;
+  cta?: unknown;
+  features?: unknown;
+  photo_fit?: unknown;
+  photo_bg?: unknown;
   align?: unknown;
   badge?: unknown;
   badge_color?: unknown;
