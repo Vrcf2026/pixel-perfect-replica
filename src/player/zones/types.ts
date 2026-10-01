@@ -37,6 +37,8 @@ export type ZoneConfig = {
   font_size?: number;
   uppercase?: boolean;
   // clock
+  clock_style?: "digital" | "ring" | "analog" | "flip";
+  accent?: string;
   format?: "HH:mm" | "HH:mm:ss";
   show_date?: boolean;
   date_format?: "long" | "short";
@@ -63,6 +65,7 @@ export type ZoneConfig = {
   lat?: number;
   lon?: number;
   forecast_days?: number;
+  animated?: boolean;
   // rss
   max_items?: number;
   mode?: "headline" | "ticker";

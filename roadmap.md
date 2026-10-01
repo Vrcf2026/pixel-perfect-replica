@@ -16,3 +16,6 @@
 - [x] Produção: guia (docs/GUIA-PRODUCAO.md), ícones em lista fechada (player mais leve), script HDMI-CEC por horário
 - [x] Fiabilidade: horário por ecrã, alertas por email (edge function check-screens + Resend), registo de exibições e página Relatórios (CSV), avisos urgentes
 - [x] Conteúdo: modelos prontos, assistente de publicidade com IA (Lovable AI, fundos gerados), zonas de meteorologia (Open-Meteo) e notícias RSS
+- [x] Arranque rápido (/arranque): lê site(s) + destaques do catálogo e prepara identidade, rodapé, playlist e layout para rever e criar
+- [x] Relógio com 4 estilos (digital, anel de segundos, analógico, flip) e meteorologia com ícones animados (dia/noite)
+- [x] Fontes: remoção em lotes (corrige erro ao remover muitas de uma vez)

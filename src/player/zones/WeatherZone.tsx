@@ -11,10 +11,12 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import type { ZoneConfig } from "./types";
+import { WeatherIcon } from "./WeatherIcon";
 
 type Wx = {
   temp: number;
   code: number;
+  isDay?: boolean;
   days: Array<{ date: string; code: number; max: number; min: number }>;
 };
 
@@ -49,11 +51,11 @@ export function WeatherZone({ config }: { config: ZoneConfig }) {
     let alive = true;
     const load = async () => {
       try {
-        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=auto&forecast_days=4`;
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code,is_day&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=auto&forecast_days=4`;
         const r = await fetch(url);
         if (!r.ok) return;
         const j = (await r.json()) as {
-          current: { temperature_2m: number; weather_code: number };
+          current: { temperature_2m: number; weather_code: number; is_day?: number };
           daily: {
             time: string[];
             weather_code: number[];
@@ -64,6 +66,7 @@ export function WeatherZone({ config }: { config: ZoneConfig }) {
         const next: Wx = {
           temp: j.current.temperature_2m,
           code: j.current.weather_code,
+          isDay: j.current.is_day !== 0,
           days: j.daily.time.map((d, i) => ({
             date: d,
             code: j.daily.weather_code[i] ?? 0,
@@ -102,6 +105,7 @@ export function WeatherZone({ config }: { config: ZoneConfig }) {
     );
   }
   const now = wmo(wx.code);
+  const animated = config.animated !== false;
   const days = Math.min(3, Math.max(0, config.forecast_days ?? 3));
   const wide = days > 0;
   return (
@@ -115,7 +119,15 @@ export function WeatherZone({ config }: { config: ZoneConfig }) {
       }}
     >
       <div className="flex items-center" style={{ gap: "3cqw" }}>
-        <now.icon style={{ width: "min(45cqh, 22cqw)", height: "min(45cqh, 22cqw)" }} />
+        {animated ? (
+          <WeatherIcon
+            code={wx.code}
+            isDay={wx.isDay ?? true}
+            style={{ width: "min(55cqh, 26cqw)", height: "min(55cqh, 26cqw)" }}
+          />
+        ) : (
+          <now.icon style={{ width: "min(45cqh, 22cqw)", height: "min(45cqh, 22cqw)" }} />
+        )}
         <div>
           <div
             style={{
@@ -149,7 +161,14 @@ export function WeatherZone({ config }: { config: ZoneConfig }) {
                 <div style={{ textTransform: "capitalize", opacity: 0.8 }}>
                   {label.replace(".", "")}
                 </div>
-                <w.icon style={{ width: "min(18cqh, 8cqw)", height: "min(18cqh, 8cqw)" }} />
+                {animated ? (
+                  <WeatherIcon
+                    code={d.code}
+                    style={{ width: "min(22cqh, 9cqw)", height: "min(22cqh, 9cqw)" }}
+                  />
+                ) : (
+                  <w.icon style={{ width: "min(18cqh, 8cqw)", height: "min(18cqh, 8cqw)" }} />
+                )}
                 <div>
                   {Math.round(d.max)}° <span style={{ opacity: 0.6 }}>{Math.round(d.min)}°</span>
                 </div>

@@ -113,31 +113,44 @@ function FontesPage() {
 
   /** Apaga fontes, avisando se estão a ser usadas em layouts ou playlists. */
   const removeMany = async (list: SourceRow[], ask = true) => {
-    if (!list.length) return;
-    const ids = list.map((r) => r.id);
+    if (!list.length || !org) return;
+    const ids = new Set(list.map((r) => r.id));
+    // Verifica utilização sem mandar listas enormes de ids no endereço do pedido.
     const [zones, items] = await Promise.all([
       supabase
         .from("layout_zones")
-        .select("id", { count: "exact", head: true })
-        .in("source_id", ids),
-      supabase
-        .from("playlist_items")
-        .select("id, data")
-        .eq("kind", "stream")
-        .eq("org_id", org?.org_id ?? ""),
+        .select("source_id")
+        .eq("org_id", org.org_id)
+        .not("source_id", "is", null),
+      supabase.from("playlist_items").select("data").eq("kind", "stream").eq("org_id", org.org_id),
     ]);
+    const usedInZones = (zones.data ?? []).filter((z) => ids.has(String(z.source_id))).length;
     const usedInItems = (items.data ?? []).filter((i) =>
-      ids.includes(String((i.data as Record<string, unknown> | null)?.["source_id"] ?? "")),
+      ids.has(String((i.data as Record<string, unknown> | null)?.["source_id"] ?? "")),
     ).length;
-    const used = (zones.count ?? 0) + usedInItems;
     const what = list.length === 1 ? `a fonte "${list[0]?.name}"` : `${list.length} fontes`;
-    const warn = used
-      ? `\n\nAtenção: está(ão) a ser usada(s) em ${zones.count ?? 0} zona(s) de layout e ${usedInItems} item(ns) de playlist. Essas zonas ficam sem vídeo.`
-      : "";
+    const warn =
+      usedInZones + usedInItems
+        ? `\n\nAtenção: está(ão) a ser usada(s) em ${usedInZones} zona(s) de layout e ${usedInItems} item(ns) de playlist. Essas zonas ficam sem vídeo.`
+        : "";
     if (ask && !confirm(`Remover ${what}?${warn}`)) return;
-    const { error } = await supabase.from("sources").delete().in("id", ids);
+
+    let error: { message: string } | null = null;
+    if (list.length === rows.length) {
+      // Todas: apaga de uma vez pela organização.
+      ({ error } = await supabase.from("sources").delete().eq("org_id", org.org_id));
+    } else {
+      const all = [...ids];
+      for (let i = 0; i < all.length && !error; i += 40) {
+        ({ error } = await supabase
+          .from("sources")
+          .delete()
+          .in("id", all.slice(i, i + 40)));
+      }
+    }
     if (error) {
       toast.error(`Não foi possível remover: ${error.message}`);
+      void load();
       return;
     }
     toast.success(list.length === 1 ? "Fonte removida." : `${list.length} fontes removidas.`);

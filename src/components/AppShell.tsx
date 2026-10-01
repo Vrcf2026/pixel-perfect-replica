@@ -18,6 +18,7 @@ import {
   PauseCircle,
   Megaphone,
   BarChart3,
+  Wand2,
 } from "lucide-react";
 import { useAuth } from "@/features/auth/AuthContext";
 import { useOrg } from "@/features/org/OrgContext";
@@ -34,6 +35,7 @@ import {
 
 const NAV = [
   { to: "/", label: "Painel", icon: LayoutDashboard },
+  { to: "/arranque", label: "Arranque rápido", icon: Wand2 },
   { to: "/ecras", label: "Ecrãs", icon: MonitorPlay },
   { to: "/layouts", label: "Layouts", icon: LayoutTemplate },
   { to: "/playlists", label: "Playlists", icon: ListVideo },

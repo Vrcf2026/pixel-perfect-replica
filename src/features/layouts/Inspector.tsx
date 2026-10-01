@@ -657,6 +657,39 @@ export function Inspector({ zone, readOnly, sources, playlists, onChange }: Prop
 
           {zone.kind === "clock" ? (
             <>
+              <Field label="Estilo">
+                <div className="grid grid-cols-2 gap-1.5">
+                  {(
+                    [
+                      ["digital", "Digital", "12:30"],
+                      ["ring", "Anel de segundos", "◔ 12:30"],
+                      ["analog", "Analógico", "🕧"],
+                      ["flip", "Flip", "1 2 : 3 0"],
+                    ] as const
+                  ).map(([v, label, sample]) => (
+                    <button
+                      key={v}
+                      type="button"
+                      onClick={() => setC({ clock_style: v })}
+                      className={`rounded-md border px-2 py-1.5 text-left text-xs ${
+                        (c.clock_style ?? "digital") === v
+                          ? "border-[#F28C28] bg-[#F28C28]/10"
+                          : "hover:border-foreground/30"
+                      }`}
+                    >
+                      <div className="font-mono text-[11px] text-muted-foreground">{sample}</div>
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </Field>
+              <Field label="Cor de destaque (segundos)">
+                <Colour
+                  value={c.accent}
+                  onChange={(accent) => setC({ accent })}
+                  fallback="#f28c28"
+                />
+              </Field>
               <Field label="Formato">
                 <Pick
                   value={c.format ?? "HH:mm"}
@@ -989,6 +1022,10 @@ function WeatherFields({ c, setC }: { c: ZoneConfig; setC: (p: ZoneConfig) => vo
             fallback="#ffffff"
           />
         </Field>
+      </div>
+      <div className="flex items-center justify-between">
+        <Label className="text-xs">Ícones animados (sol a rodar, chuva a cair…)</Label>
+        <Switch checked={c.animated !== false} onCheckedChange={(animated) => setC({ animated })} />
       </div>
       <p className="text-[11px] text-muted-foreground">
         Dados de Open-Meteo, atualizados a cada 30 minutos.

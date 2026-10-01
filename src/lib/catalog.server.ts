@@ -154,3 +154,17 @@ export function productFacts(p: CatalogProduct) {
     .filter(Boolean)
     .join("\n");
 }
+
+/** Produtos em destaque no catálogo (marcados como destaque ou na página inicial). */
+export async function featuredProducts(limit: number): Promise<CatalogProduct[]> {
+  const n = String(Math.min(12, Math.max(1, limit)));
+  const featured = await query({ featured: "eq.true", include_in_catalog: "eq.true", limit: n });
+  if (featured.length >= limit) return featured;
+  const home = await query({
+    show_on_homepage: "eq.true",
+    include_in_catalog: "eq.true",
+    limit: n,
+  });
+  const seen = new Set(featured.map((p) => p.id));
+  return [...featured, ...home.filter((p) => !seen.has(p.id))].slice(0, limit);
+}
