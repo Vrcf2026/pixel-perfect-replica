@@ -14,6 +14,59 @@ export type Database = {
   }
   public: {
     Tables: {
+      campaigns: {
+        Row: {
+          bg: string
+          body: string | null
+          created_at: string
+          enabled: boolean
+          ends_at: string
+          id: string
+          org_id: string
+          screen_ids: string[] | null
+          starts_at: string
+          style: string
+          text_color: string
+          title: string
+        }
+        Insert: {
+          bg?: string
+          body?: string | null
+          created_at?: string
+          enabled?: boolean
+          ends_at: string
+          id?: string
+          org_id: string
+          screen_ids?: string[] | null
+          starts_at?: string
+          style?: string
+          text_color?: string
+          title: string
+        }
+        Update: {
+          bg?: string
+          body?: string | null
+          created_at?: string
+          enabled?: boolean
+          ends_at?: string
+          id?: string
+          org_id?: string
+          screen_ids?: string[] | null
+          starts_at?: string
+          style?: string
+          text_color?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "campaigns_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       layout_zones: {
         Row: {
           config: Json
@@ -225,6 +278,7 @@ export type Database = {
       }
       organizations: {
         Row: {
+          alert_emails: string[]
           config_version: number
           created_at: string
           id: string
@@ -236,6 +290,7 @@ export type Database = {
           theme: Json
         }
         Insert: {
+          alert_emails?: string[]
           config_version?: number
           created_at?: string
           id?: string
@@ -247,6 +302,7 @@ export type Database = {
           theme?: Json
         }
         Update: {
+          alert_emails?: string[]
           config_version?: number
           created_at?: string
           id?: string
@@ -258,6 +314,84 @@ export type Database = {
           theme?: Json
         }
         Relationships: []
+      }
+      platform_settings: {
+        Row: {
+          admin_email: string | null
+          alert_after_min: number
+          from_email: string
+          id: boolean
+          updated_at: string
+        }
+        Insert: {
+          admin_email?: string | null
+          alert_after_min?: number
+          from_email?: string
+          id?: boolean
+          updated_at?: string
+        }
+        Update: {
+          admin_email?: string | null
+          alert_after_min?: number
+          from_email?: string
+          id?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      play_stats: {
+        Row: {
+          day: string
+          item_id: string | null
+          item_key: string
+          kind: string | null
+          label: string | null
+          org_id: string
+          playlist_id: string | null
+          plays: number
+          screen_id: string
+          seconds: number
+        }
+        Insert: {
+          day: string
+          item_id?: string | null
+          item_key: string
+          kind?: string | null
+          label?: string | null
+          org_id: string
+          playlist_id?: string | null
+          plays?: number
+          screen_id: string
+          seconds?: number
+        }
+        Update: {
+          day?: string
+          item_id?: string | null
+          item_key?: string
+          kind?: string | null
+          label?: string | null
+          org_id?: string
+          playlist_id?: string | null
+          plays?: number
+          screen_id?: string
+          seconds?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "play_stats_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "play_stats_screen_id_fkey"
+            columns: ["screen_id"]
+            isOneToOne: false
+            referencedRelation: "screens"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       playlist_items: {
         Row: {
@@ -435,6 +569,8 @@ export type Database = {
       }
       screens: {
         Row: {
+          alert_sent_at: string | null
+          alerts_enabled: boolean
           config_version: number
           created_at: string
           default_layout_id: string | null
@@ -444,6 +580,9 @@ export type Database = {
           last_seen_at: string | null
           name: string
           notes: string | null
+          open_days: number[]
+          open_from: string | null
+          open_to: string | null
           org_id: string
           orientation: string
           pending_command: string | null
@@ -454,6 +593,8 @@ export type Database = {
           width: number
         }
         Insert: {
+          alert_sent_at?: string | null
+          alerts_enabled?: boolean
           config_version?: number
           created_at?: string
           default_layout_id?: string | null
@@ -463,6 +604,9 @@ export type Database = {
           last_seen_at?: string | null
           name: string
           notes?: string | null
+          open_days?: number[]
+          open_from?: string | null
+          open_to?: string | null
           org_id: string
           orientation?: string
           pending_command?: string | null
@@ -473,6 +617,8 @@ export type Database = {
           width?: number
         }
         Update: {
+          alert_sent_at?: string | null
+          alerts_enabled?: boolean
           config_version?: number
           created_at?: string
           default_layout_id?: string | null
@@ -482,6 +628,9 @@ export type Database = {
           last_seen_at?: string | null
           name?: string
           notes?: string | null
+          open_days?: number[]
+          open_from?: string | null
+          open_to?: string | null
           org_id?: string
           orientation?: string
           pending_command?: string | null
@@ -628,7 +777,24 @@ export type Database = {
         Returns: boolean
       }
       is_superadmin: { Args: never; Returns: boolean }
+      player_log_plays: {
+        Args: { p_entries: Json; p_token: string }
+        Returns: number
+      }
       player_ping: { Args: { p_info?: Json; p_token: string }; Returns: Json }
+      screens_alert_state: {
+        Args: never
+        Returns: {
+          emails: string[]
+          last_seen_at: string
+          org_id: string
+          org_name: string
+          screen_id: string
+          screen_name: string
+          state: string
+          timezone: string
+        }[]
+      }
     }
     Enums: {
       app_role: "superadmin"
@@ -659,6 +825,8 @@ export type Database = {
         | "text"
         | "qr"
         | "webpage"
+        | "weather"
+        | "rss"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -808,6 +976,8 @@ export const Constants = {
         "text",
         "qr",
         "webpage",
+        "weather",
+        "rss",
       ],
     },
   },
